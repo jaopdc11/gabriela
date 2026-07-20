@@ -34,14 +34,14 @@ export function Hero() {
       </h1>
 
       <p className="label mt-10 animate-title-in text-ember/80" style={delay(1500)}>
-        06 · 06 · 2026 · a noite em que tudo começou
+        06 · 06 · 2026
       </p>
 
       <div className="mt-14 animate-title-in" style={delay(1900)}>
         <p className="label mb-4 text-mist">a gente se conhece há</p>
         {elapsed && <CounterTimecode elapsed={elapsed} />}
       </div>
-      <p className="sr-only">A gente se conhece desde 6 de junho de 2026.</p>
+      <p className="sr-only">Nos conhecemos 6 de junho de 2026.</p>
 
       <a
         href="#antes"

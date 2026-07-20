@@ -39,6 +39,14 @@
   .label {
     @apply font-mono text-[0.66rem] font-medium uppercase tracking-label text-mist;
   }
+  /* Rolagem sem barra visível (usada na caixa de legenda sobre o céu) */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
   .timecode {
     @apply font-mono tabular-nums;
     font-variant-numeric: tabular-nums;

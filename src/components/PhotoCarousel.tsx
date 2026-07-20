@@ -155,13 +155,34 @@ export function PhotoCarousel() {
             </svg>
           </button>
 
-          <img
-            src={PHOTOS[sel]}
-            alt={`Nós dois, foto ${sel + 1}`}
+          {/* moldura polaroid: papel creme, base pra legenda, sombra de cinema */}
+          <div
+            key={sel}
             onClick={(e) => e.stopPropagation()}
-            className="max-h-[88vh] max-w-[92vw] animate-title-in rounded-md object-contain shadow-[0_30px_120px_-30px_rgba(0,0,0,0.9)] ring-1 ring-ember/20"
-            draggable={false}
-          />
+            className="relative animate-title-in rounded-[4px] bg-[#f4efe3] p-3 pb-11 shadow-[0_40px_130px_-30px_rgba(0,0,0,0.95)] sm:p-4 sm:pb-14"
+          >
+            {/* textura de papel + calço interno */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-[4px] bg-gradient-to-br from-white/40 via-transparent to-black/[0.06]"
+            />
+            <span className="relative block overflow-hidden rounded-[2px] ring-1 ring-black/10">
+              <img
+                src={PHOTOS[sel]}
+                alt={`Nós dois, foto ${sel + 1}`}
+                className="block max-h-[76vh] max-w-[86vw] object-contain"
+                draggable={false}
+              />
+              {/* vinheta suave nas bordas da foto */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 shadow-[inset_0_0_60px_-20px_rgba(0,0,0,0.5)]"
+              />
+            </span>
+            <p className="absolute inset-x-0 bottom-3 text-center font-mono text-[0.7rem] uppercase tracking-label text-[#8a7256] sm:bottom-4">
+              {(sel + 1).toString().padStart(2, '0')} / {n.toString().padStart(2, '0')}
+            </p>
+          </div>
 
           <button
             onClick={(e) => {
@@ -175,10 +196,6 @@ export function PhotoCarousel() {
               <path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-
-          <p className="label absolute bottom-6 left-1/2 -translate-x-1/2 text-ember/80">
-            {(sel + 1).toString().padStart(2, '0')} / {n.toString().padStart(2, '0')}
-          </p>
         </div>
       )}
     </section>

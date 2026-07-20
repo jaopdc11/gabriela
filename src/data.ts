@@ -97,8 +97,13 @@ Ali eu senti uma coisa que lá no fundo eu já sabia, mas que naquele momento vi
   },
   {
     date: new Date(2026, 6, 19),
-    title: 'O show do Alexandre Pires',
-    description: `Essa estrela tá guardada pro nosso primeiro show juntos: Alexandre Pires, puro pagode. Quando o dia chegar eu volto aqui e conto tudo, como foi cantar essas músicas todas grudado em você.`,
+    title: 'A noite que o show não rolou (e foi perfeita)',
+    description: `Era pra ser o show do Alexandre Pires, o nosso primeiro show juntos. Mas a gente ficou agarradinho o dia inteiro, se atrasou, e quando fomos nos arrumar já era tarde demais. O Uber tava quase 100 conto, e a gente só se olhou e desistiu. Começamos a pensar no que fazer.
+Você queria me levar num café pra gente comer, mas não achamos nada muito legal. Aí eu sugeri a gente só comprar umas coisinhas e ficar vendo um filme agarradinho, e o sorriso que você deu me derreteu todo. Compramos tudo, chegamos em casa e no fim decidimos ir pra praia primeiro.
+Fomos pra praia à noite, sentamos e conversamos. E esse papo foi MUITO importante. Eu te contei toda a minha história com a depressão, os meus traumas, as minhas tentativas, tudo. E você me ouviu sem me julgar nenhuma vez. Eu vi os teus olhos marejarem, e foi isso que me quebrou, chorei por ver você assim, não pela história kkkkkk. Fiz questão de você entender que eu sou grato pela minha vida, que você não precisa se preocupar comigo, e a gente ficou tranquilo. Depois você me contou a tua história, e eu não vou mentir que não fiquei com raiva, porque fiquei, muito, da tua mãe e mais ainda da tua tia e da tua prima. Me deu um ódio. Mas enfim, a gente ainda provou uns chocolates estranhos, e no fim até que eu gostei.
+Aí eu chorei de novo, mas dessa vez porque a gente foi firmar uma vela pra Iemanjá. A coitada não conseguia acender de jeito nenhum, mesmo eu ajudando, e eu te acalmei dizendo que podia firmar em casa que tava tudo certo. Ver você batendo cabeça pra Iemanjá me fez um bem que eu não sei explicar. Eu vi os espíritos das águas ali na praia presenciando aquilo, mas não te falei nada pra não te assustar. Recebi uma irradiação do meu marinheiro e só senti a certeza de que a gente se ama, e de que a mãe d'água tinha dado a bênção dela pro nosso amor.
+Voltamos pra casa pedalando, eu quase morrendo do joelho mas segui firme. Você tirava os pés do pedal pra balançar as pernas e eu achava a coisa mais linda do mundo, eu amo te ver, cada detalhe teu. Chegando em casa eu firmei uma vela de erê pra levantar o astral da tua casa, e senti a energia irradiar em mim, E EM VOCÊ TAMBÉM. Eu vi no teu olhar que você tava irradiando, foi lindo demais. Você reparou que eu tava todo mexido e a gente riu pra caramba kkkkkk.
+Depois deitamos pra ver o filme e você já tava quase dormindo. Aproveitei que no dia seguinte, por conta do meu preceito, a gente não ia poder se tocar, e tirei o filme só pra gente ficar agarradinho. Me declarei pra você, como eu faço todo santo dia, e a gente dormiu ali (era pra eu ter ido pra casa) kkkkkk. O show não rolou, mas essa noite foi uma das mais importantes pra mim.`,
     x: 65,
     y: 11,
   },

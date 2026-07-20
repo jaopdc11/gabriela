@@ -468,11 +468,11 @@ export function NightJourney() {
         </svg>
 
         {/* scrim: garante leitura do texto sobre o céu (legenda de cinema) */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[72vh] bg-gradient-to-t from-night via-night/92 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[82vh] bg-gradient-to-t from-night via-night/95 to-transparent" />
 
         {/* lower-third: no mobile vira uma caixa delimitada (topo abaixo do céu, base acima
             da borda) com o texto centralizado, pra nunca vazar; no desktop, ancorado embaixo. */}
-        <div className="absolute inset-x-0 bottom-[3vh] top-[27vh] flex flex-col justify-center px-6 sm:bottom-[7vh] sm:top-auto sm:block">
+        <div className="absolute inset-x-0 bottom-[3vh] top-[24vh] flex flex-col justify-end px-4 sm:bottom-[6vh] sm:top-auto sm:block sm:px-6">
           {onProposal ? (
             <div key="proposal" className="mx-auto max-w-xl animate-title-in text-center">
               <p className="label text-ember/80">{PROPOSAL.label}</p>
@@ -496,9 +496,11 @@ export function NightJourney() {
               <h2 className="mt-2 font-display text-[1.7rem] font-light leading-tight text-star sm:mt-3 sm:text-5xl">
                 {milestones[active].title}
               </h2>
-              <p className="mx-auto mt-3 max-w-2xl whitespace-pre-line text-[0.78rem] leading-[1.5] text-mist sm:text-[0.95rem] sm:leading-relaxed">
-                {milestones[active].description}
-              </p>
+              <div className="no-scrollbar mx-auto mt-3 max-h-[42vh] max-w-2xl overflow-y-auto overscroll-contain rounded-2xl bg-night/55 px-4 py-3 backdrop-blur-[2px] sm:max-h-[46vh] sm:px-6 sm:py-4">
+                <p className="whitespace-pre-line text-[0.8rem] leading-[1.55] text-mist sm:text-[0.95rem] sm:leading-relaxed">
+                  {milestones[active].description}
+                </p>
+              </div>
             </div>
           )}
         </div>

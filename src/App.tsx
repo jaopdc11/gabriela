@@ -4,6 +4,7 @@ import { Hero } from './components/Hero'
 import { Prologue } from './components/Prologue'
 import { NightJourney } from './components/NightJourney'
 import { PhotoCarousel } from './components/PhotoCarousel'
+import { Epilogue } from './components/Epilogue'
 import { AmbientAudio } from './components/AmbientAudio'
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
         <Prologue />
         <NightJourney />
         <PhotoCarousel />
+        <Epilogue />
       </main>
     </div>
   )
