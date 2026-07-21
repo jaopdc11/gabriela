@@ -51,12 +51,6 @@ export function Epilogue() {
       </Reveal>
 
       <Reveal>
-        <p className="mx-auto max-w-xl text-[0.98rem] leading-relaxed text-star/80 sm:text-lg">
-          cada estrela desse céu aconteceu de verdade. e ainda tem uma esperando o dia de nascer.
-        </p>
-      </Reveal>
-
-      <Reveal>
         <p className="mx-auto max-w-2xl font-display text-2xl font-light italic leading-tight text-ember sm:text-4xl">
           eu nunca confiei em lugar seguro. até você virar o meu.
         </p>
@@ -75,13 +69,6 @@ export function Epilogue() {
         <p className="mx-auto max-w-md text-base leading-relaxed text-star/80 sm:text-lg">
           obrigado por ser tudo o que eu pedi pra espiritualidade. e por ter chegado.
         </p>
-      </Reveal>
-
-      <Reveal>
-        <div>
-          <p className="label text-mist">pra sempre, seu João</p>
-          <p className="label mt-4 text-mist/40">isso aqui é só o fim do site</p>
-        </div>
       </Reveal>
     </section>
   )
