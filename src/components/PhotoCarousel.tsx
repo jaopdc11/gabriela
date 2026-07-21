@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+/** Distância mínima (px) de um arrastar pra contar como troca de foto. */
+const SWIPE_THRESHOLD = 45
 
 /** Carrega automaticamente todas as fotos de src/fotos (ordem alfabética do nome). */
 const modules = import.meta.glob('../fotos/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
@@ -86,6 +89,28 @@ export function PhotoCarousel() {
   const [sel, setSel] = useState<number | null>(null)
   const open = sel !== null
 
+  const go = useCallback(
+    (dir: number) => setSel((s) => (s === null ? s : (s + dir + n) % n)),
+    [n],
+  )
+
+  // arrastar pra os lados troca de foto (mobile): guarda o toque inicial e mede o delta
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0]
+    touchStart.current = { x: t.clientX, y: t.clientY }
+  }
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchStart.current
+    touchStart.current = null
+    if (!start) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - start.x
+    const dy = t.clientY - start.y
+    // só conta como swipe se for horizontal o suficiente (não confunde com scroll/tap)
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1)
+  }
+
   // trava scroll do fundo + teclado (Esc fecha, setas navegam) com o lightbox aberto
   useEffect(() => {
     if (!open) return
@@ -94,15 +119,15 @@ export function PhotoCarousel() {
     body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSel(null)
-      if (e.key === 'ArrowLeft') setSel((s) => (s === null ? s : (s - 1 + n) % n))
-      if (e.key === 'ArrowRight') setSel((s) => (s === null ? s : (s + 1) % n))
+      if (e.key === 'ArrowLeft') go(-1)
+      if (e.key === 'ArrowRight') go(1)
     }
     window.addEventListener('keydown', onKey)
     return () => {
       body.style.overflow = prevOverflow
       window.removeEventListener('keydown', onKey)
     }
-  }, [open, n])
+  }, [open, go])
 
   return (
     <section id="album" className="relative mx-auto max-w-6xl px-6 py-28 text-center sm:py-36">
@@ -131,6 +156,8 @@ export function PhotoCarousel() {
         <div
           className="fixed inset-0 z-[70] flex items-center justify-center bg-night-deep/92 px-4 backdrop-blur-sm"
           onClick={() => setSel(null)}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
           role="dialog"
           aria-modal="true"
         >
@@ -145,7 +172,7 @@ export function PhotoCarousel() {
           <button
             onClick={(e) => {
               e.stopPropagation()
-              setSel((s) => (s === null ? s : (s - 1 + n) % n))
+              go(-1)
             }}
             aria-label="Foto anterior"
             className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:left-8"
@@ -187,7 +214,7 @@ export function PhotoCarousel() {
           <button
             onClick={(e) => {
               e.stopPropagation()
-              setSel((s) => (s === null ? s : (s + 1) % n))
+              go(1)
             }}
             aria-label="Próxima foto"
             className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:right-8"

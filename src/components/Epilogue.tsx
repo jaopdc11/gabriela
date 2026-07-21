@@ -42,19 +42,46 @@ export function Epilogue() {
   return (
     <section
       id="fim"
-      className="relative flex min-h-[88svh] flex-col items-center justify-center px-6 py-32 text-center"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center gap-12 px-6 py-32 text-center sm:gap-16"
     >
       <Reveal>
-        <span className="mb-10 block animate-breathe text-2xl text-ember/70" aria-hidden>
+        <span className="block animate-breathe text-2xl text-ember/70" aria-hidden>
           ✦
         </span>
+      </Reveal>
+
+      <Reveal>
+        <p className="mx-auto max-w-xl text-[0.98rem] leading-relaxed text-star/80 sm:text-lg">
+          cada estrela desse céu aconteceu de verdade. e ainda tem uma esperando o dia de nascer.
+        </p>
+      </Reveal>
+
+      <Reveal>
+        <p className="mx-auto max-w-2xl font-display text-2xl font-light italic leading-tight text-ember sm:text-4xl">
+          eu nunca confiei em lugar seguro. até você virar o meu.
+        </p>
+      </Reveal>
+
+      <Reveal>
         <p
           className="mx-auto max-w-4xl font-display font-light italic leading-[1.05] text-ember text-[2.5rem] sm:text-[5.5rem]"
           style={{ textShadow: '0 0 60px rgba(230, 192, 122, 0.2)' }}
         >
           Eu te amo pra um caralho
         </p>
-        <p className="label mt-14 text-mist">pra sempre — João</p>
+      </Reveal>
+
+      <Reveal>
+        <p className="mx-auto max-w-md text-base leading-relaxed text-star/80 sm:text-lg">
+          obrigado por ser tudo o que eu pedi pra espiritualidade. e por ter chegado.
+        </p>
+      </Reveal>
+
+      <Reveal>
+        <div>
+          <p className="label text-mist">pra sempre, seu João</p>
+          <p className="label mt-4 text-mist/40">isso aqui é só o fim do site</p>
+        </div>
       </Reveal>
     </section>
   )

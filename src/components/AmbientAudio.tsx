@@ -61,7 +61,9 @@ export function AmbientAudio() {
 
   return (
     <>
-      <audio ref={audioRef} src={TRACK_SRC} loop preload="auto" />
+      {/* preload="none": não baixa os ~4 MB na abertura (competia com as fotos no
+          mobile); o play() no primeiro gesto dispara o download na hora certa. */}
+      <audio ref={audioRef} src={TRACK_SRC} loop preload="none" />
       <button
         onClick={toggle}
         aria-label={playing ? 'Pausar música' : 'Tocar música'}

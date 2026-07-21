@@ -32,7 +32,7 @@ const SAT_RINGS = [
 ]
 
 const N = milestones.length
-const SCENES = N + 1 // 6 momentos + o pedido
+const SCENES = N + 1 // os momentos + a estrela do pedido
 
 /** Ponto de "acendimento" de cada cena ao longo do scroll (0–1). */
 const revealAt = (i: number) => 0.05 + 0.92 * (i / (SCENES - 1))

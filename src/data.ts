@@ -110,7 +110,9 @@ Depois deitamos pra ver o filme e você já tava quase dormindo. Aproveitei que 
   {
     date: new Date(2026, 6, 20),
     title: 'O meu amaci (você no meu terreiro)',
-    description: `Essa é uma das estrelas mais importantes de todas, por isso ela tá reservada com todo cuidado. É o dia em que você vai pisar no meu terreiro, no meu amaci, o meu momento mais sagrado, o mais meu que existe. Te levar pra lá é te abrir a minha fé inteira. Depois que acontecer, eu venho aqui e preencho com o que a gente viver.`,
+    description: `Essa é uma das estrelas mais importantes de todas, o dia em que você pisou no meu terreiro, no meu amaci, o meu momento mais sagrado, o mais meu que existe. Te levar pra lá foi te abrir a minha fé inteira.
+No fim foi tudo tranquilo, você chegou, ficou até o final e me viu incorporado. Pelo que você me contou depois, parece que não te dei passe, mas eu sei o que senti: quando a minha Oxum baixou, senti ela mandando um axé pra você. A gente ainda comeu bolo do terreiro, e você foi falar com a minha mãe de santo sobre o Seo Tranca Rua das Almas, pra agradecer ele. Coisa simples, sem muito o que contar.
+Mas pra mim foi significativo DEMAIS. Não pelo que aconteceu, e sim pelo fato de ser VOCÊ ali, entrando no meu mundinho, no lugar mais meu que existe. Foi você pisando no meu chão sagrado. E isso eu não esqueço nunca.`,
     x: 72,
     y: 19,
   },
