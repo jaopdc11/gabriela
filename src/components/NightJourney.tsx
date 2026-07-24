@@ -158,7 +158,7 @@ export function NightJourney() {
 
         {/* céu / constelação */}
         <svg
-          className="absolute inset-x-[8vw] top-[11vh] h-[20vh] sm:top-[15vh] sm:h-[46vh]"
+          className="absolute inset-x-[8vw] top-[23vh] h-[20vh] sm:top-[15vh] sm:h-[46vh]"
           viewBox="0 0 100 44"
           preserveAspectRatio="xMidYMid meet"
           aria-hidden
