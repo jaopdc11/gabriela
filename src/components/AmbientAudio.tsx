@@ -43,14 +43,26 @@ export function AmbientAudio() {
     }
     start()
 
-    const onFirstGesture = () => {
-      if (audio.paused) start()
-      removeGestureListeners()
-    }
-    const events = ['pointerdown', 'keydown', 'touchstart', 'scroll', 'wheel'] as const
+    // insiste em cada gesto até o play REALMENTE começar (no Android um scroll
+    // passivo às vezes não libera o som; só solta os listeners quando tocar)
+    const events = ['pointerdown', 'touchend', 'click', 'keydown', 'scroll', 'wheel'] as const
     const removeGestureListeners = () =>
-      events.forEach((ev) => window.removeEventListener(ev, onFirstGesture))
-    events.forEach((ev) => window.addEventListener(ev, onFirstGesture, { once: false, passive: true }))
+      events.forEach((ev) => window.removeEventListener(ev, onGesture))
+    const onGesture = () => {
+      if (!audio.paused) {
+        removeGestureListeners()
+        return
+      }
+      audio
+        .play()
+        .then(() => {
+          audio.playbackRate = SPEED
+          setPlaying(true)
+          removeGestureListeners()
+        })
+        .catch(() => {})
+    }
+    events.forEach((ev) => window.addEventListener(ev, onGesture, { passive: true }))
 
     const onPlay = () => {
       audio.playbackRate = SPEED // reafirma a cada faixa (o src novo reseta)

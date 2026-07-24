@@ -151,7 +151,7 @@ export function NightJourney() {
       style={{ height: `calc(var(--scene-h, 56vh) * ${SCENES} + 44vh)` }}
       className="relative"
     >
-      <div className="sticky top-0 flex h-[100svh] flex-col overflow-hidden">
+      <div className="sticky top-0 flex h-[100dvh] flex-col overflow-hidden">
         <p className="label absolute left-1/2 top-[3vh] -translate-x-1/2 text-mist sm:top-[9vh]">
           a nossa constelação
         </p>
