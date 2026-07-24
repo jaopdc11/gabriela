@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react'
-import { START_DATE } from '../data'
+import { useState, type CSSProperties } from 'react'
+import { START_DATE, NAMORO_DATE } from '../data'
 import { useElapsed } from '../useElapsed'
 import { CounterTimecode } from './CounterTimecode'
 import { AUDIO_PLAY_EVENT } from './AmbientAudio'
@@ -8,7 +8,10 @@ const delay = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` })
 
 /** Abertura: título de cinema sobre o céu. */
 export function Hero() {
-  const elapsed = useElapsed(START_DATE)
+  const elapsedConhecemos = useElapsed(START_DATE)
+  const elapsedNamoro = useElapsed(NAMORO_DATE)
+  const [mode, setMode] = useState<'conhecemos' | 'namoro'>('conhecemos')
+  const elapsed = mode === 'conhecemos' ? elapsedConhecemos : elapsedNamoro
 
   return (
     <header className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 text-center">
@@ -40,9 +43,26 @@ export function Hero() {
 
       <div className="mt-14 animate-title-in" style={delay(1900)}>
         {elapsed && <CounterTimecode elapsed={elapsed} />}
-        <p className="label mb-4 text-mist">desde que nos conhecemos</p>
+        {/* botão que alterna o contador entre "nos conhecemos" e "namorando" */}
+        <div className="mb-4 mt-5 flex items-center justify-center gap-1.5">
+          {(['conhecemos', 'namoro'] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`label rounded-full px-3.5 py-1.5 transition-colors ${
+                mode === m
+                  ? 'bg-ember/15 text-ember ring-1 ring-ember/40'
+                  : 'text-mist hover:text-star'
+              }`}
+            >
+              {m === 'conhecemos' ? 'desde que nos conhecemos' : 'namorando'}
+            </button>
+          ))}
+        </div>
       </div>
-      <p className="sr-only">Nos conhecemos 6 de junho de 2026.</p>
+      <p className="sr-only">
+        Nos conhecemos 6 de junho de 2026 e começamos a namorar 23 de julho de 2026.
+      </p>
 
       <a
         href="#antes"

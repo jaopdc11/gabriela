@@ -10,6 +10,8 @@ export type Milestone = {
 
 /** A data em que tudo começou — usada no contador principal. */
 export const START_DATE = new Date(2026, 5, 7, 3, 30) // 07/06/2026 03:30
+/** O dia do sim — usada no contador de namoro. */
+export const NAMORO_DATE = new Date(2026, 6, 23, 21, 30) // 23/07/2026 21:30
 
 /** Nossa constelação: cada estrela é um momento, em ordem cronológica. */
 export const milestones: Milestone[] = [
