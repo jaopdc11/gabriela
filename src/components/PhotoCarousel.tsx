@@ -52,6 +52,10 @@ const tapeOf = (k: number) => ((k * 31) % 15) - 7 // rotação da fita
 const reducedMotion = () =>
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
+/** Tela estreita (mobile) — sem flutuação perpétua pra não travar o scroll. */
+const isNarrow = () =>
+  typeof matchMedia !== 'undefined' && matchMedia('(max-width: 640px)').matches
+
 /** Selo de "play" sobre a capa de um vídeo. */
 function PlayBadge() {
   return (
@@ -97,8 +101,14 @@ function MediaCard({ item, k, onOpen }: { item: Media; k: number; onOpen: () => 
       }`}
       style={{ transitionDelay: `${(k % 6) * 90}ms` }}
     >
-      {/* camada da flutuação */}
-      <div style={{ animation: `float-y ${durOf(k)}s ease-in-out ${delayOf(k)}s infinite` }}>
+      {/* camada da flutuação (desligada no mobile pra não travar o scroll) */}
+      <div
+        style={
+          reducedMotion() || isNarrow()
+            ? undefined
+            : { animation: `float-y ${durOf(k)}s ease-in-out ${delayOf(k)}s infinite` }
+        }
+      >
         <button
           onClick={onOpen}
           aria-label={isVideo ? `Abrir vídeo ${k + 1}` : `Ampliar foto ${k + 1}`}
@@ -244,7 +254,7 @@ export function PhotoCarousel() {
       {/* lightbox / tela cheia */}
       {open && sel !== null && current && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-night-deep/92 px-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-night-deep/95 px-4 sm:backdrop-blur-sm"
           onClick={() => setSel(null)}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
@@ -265,7 +275,7 @@ export function PhotoCarousel() {
               go(-1)
             }}
             aria-label="Anterior"
-            className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:left-8"
+            className="absolute left-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:left-8"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -311,7 +321,7 @@ export function PhotoCarousel() {
               go(1)
             }}
             aria-label="Próxima"
-            className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:right-8"
+            className="absolute right-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:right-8"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />

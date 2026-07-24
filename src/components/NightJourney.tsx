@@ -94,7 +94,9 @@ function useSectionProgress(ref: RefObject<HTMLElement | null>) {
     const update = () => {
       const total = el.offsetHeight - window.innerHeight
       const scrolled = -el.getBoundingClientRect().top
-      setP(total > 0 ? clamp(scrolled / total) : 0)
+      const next = total > 0 ? clamp(scrolled / total) : 0
+      // ignora variações mínimas → menos re-render do SVG por frame (mobile mais leve)
+      setP((prev) => (Math.abs(next - prev) < 0.0015 ? prev : next))
     }
     const onScroll = () => {
       cancelAnimationFrame(raf)
@@ -516,8 +518,11 @@ export function NightJourney() {
               <h2 className="mt-2 font-display text-[1.7rem] font-light leading-tight text-star sm:mt-3 sm:text-5xl">
                 {PROPOSAL.title}
               </h2>
-              <div className="no-scrollbar mx-auto mt-3 max-h-[38vh] max-w-2xl overflow-y-auto overscroll-contain rounded-2xl bg-night/75 px-4 py-3 backdrop-blur-sm sm:max-h-[42vh] sm:px-6 sm:py-4">
-                <p className="whitespace-pre-line text-[0.8rem] leading-[1.55] text-mist sm:text-[0.95rem] sm:leading-relaxed">
+              <div className="no-scrollbar mx-auto mt-3 max-h-[38vh] max-w-2xl overflow-y-auto overscroll-contain px-4 py-3 sm:max-h-[42vh] sm:px-6 sm:py-4">
+                <p
+                  className="whitespace-pre-line text-[0.8rem] leading-[1.55] text-mist sm:text-[0.95rem] sm:leading-relaxed"
+                  style={{ textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.7)' }}
+                >
                   {highlightSacred(PROPOSAL.description)}
                 </p>
               </div>
@@ -538,8 +543,11 @@ export function NightJourney() {
               <h2 className="mt-2 font-display text-[1.7rem] font-light leading-tight text-star sm:mt-3 sm:text-5xl">
                 {milestones[active].title}
               </h2>
-              <div className="no-scrollbar mx-auto mt-3 max-h-[42vh] max-w-2xl overflow-y-auto overscroll-contain rounded-2xl bg-night/75 px-4 py-3 backdrop-blur-sm sm:max-h-[46vh] sm:px-6 sm:py-4">
-                <p className="whitespace-pre-line text-[0.8rem] leading-[1.55] text-mist sm:text-[0.95rem] sm:leading-relaxed">
+              <div className="no-scrollbar mx-auto mt-3 max-h-[42vh] max-w-2xl overflow-y-auto overscroll-contain px-4 py-3 sm:max-h-[46vh] sm:px-6 sm:py-4">
+                <p
+                  className="whitespace-pre-line text-[0.8rem] leading-[1.55] text-mist sm:text-[0.95rem] sm:leading-relaxed"
+                  style={{ textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.7)' }}
+                >
                   {highlightSacred(milestones[active].description)}
                 </p>
               </div>
