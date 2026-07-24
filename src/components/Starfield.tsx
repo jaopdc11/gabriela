@@ -84,8 +84,9 @@ export function Starfield() {
       h = window.innerHeight
       canvas!.width = Math.floor(w * dpr)
       canvas!.height = Math.floor(h * dpr)
-      canvas!.style.width = w + 'px'
-      canvas!.style.height = h + 'px'
+      // sem style width/height fixos: o `fixed inset-0` estica o canvas pra
+      // preencher a viewport inteira mesmo quando a barra do navegador recolhe
+      // (senão sobra uma faixa escura embaixo em toda a página no mobile)
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
 
       // densidade proporcional à área, com teto pra performance

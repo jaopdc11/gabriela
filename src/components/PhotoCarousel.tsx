@@ -217,6 +217,20 @@ export function PhotoCarousel() {
     }
   }, [open, go])
 
+  // botão "voltar" do celular fecha o lightbox (empurra um estado no histórico
+  // ao abrir; o back dispara popstate e a gente fecha em vez de sair da página)
+  useEffect(() => {
+    if (!open) return
+    window.history.pushState({ lightbox: true }, '')
+    const onPop = () => setSel(null)
+    window.addEventListener('popstate', onPop)
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      // fechou pela UI (X/Esc/toque fora): remove o estado que a gente empurrou
+      if (window.history.state?.lightbox) window.history.back()
+    }
+  }, [open])
+
   // abaixa a música só enquanto um VÍDEO está em destaque; restaura ao fechar
   // ou ao trocar pra uma foto
   useEffect(() => {
