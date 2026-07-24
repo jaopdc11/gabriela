@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { START_DATE } from '../data'
 import { useElapsed } from '../useElapsed'
 import { CounterTimecode } from './CounterTimecode'
+import { AUDIO_PLAY_EVENT } from './AmbientAudio'
 
 const delay = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` })
 
@@ -45,6 +46,7 @@ export function Hero() {
 
       <a
         href="#antes"
+        onClick={() => window.dispatchEvent(new Event(AUDIO_PLAY_EVENT))}
         className="group absolute bottom-[8vh] flex flex-col items-center gap-3 text-mist transition-colors hover:text-star"
         aria-label="Começar"
       >

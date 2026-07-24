@@ -10,6 +10,8 @@ const VOLUME = 0.45
 const DUCKED = 0.06
 /** Evento pra abaixar/restaurar a música (disparado ao abrir/fechar vídeo). */
 export const AUDIO_DUCK_EVENT = 'audio-duck'
+/** Evento pra iniciar a música (disparado por um gesto disfarçado, ex.: "desce aí"). */
+export const AUDIO_PLAY_EVENT = 'ambient-play'
 
 /**
  * Trilha de fundo em playlist. Tenta tocar assim que o site abre; se o navegador
@@ -93,6 +95,12 @@ export function AmbientAudio() {
     }
     window.addEventListener(AUDIO_DUCK_EVENT, onDuck)
 
+    // pedido explícito de play (vindo de um gesto disfarçado, ex.: o "desce aí")
+    const onPlayRequest = () => {
+      if (audio.paused) start()
+    }
+    window.addEventListener(AUDIO_PLAY_EVENT, onPlayRequest)
+
     return () => {
       removeGestureListeners()
       cancelAnimationFrame(fadeRaf)
@@ -100,6 +108,7 @@ export function AmbientAudio() {
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('pause', onPause)
       window.removeEventListener(AUDIO_DUCK_EVENT, onDuck)
+      window.removeEventListener(AUDIO_PLAY_EVENT, onPlayRequest)
     }
   }, [])
 
