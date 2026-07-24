@@ -52,7 +52,7 @@ export function Epilogue() {
 
       <Reveal>
         <p className="mx-auto max-w-2xl font-display text-2xl font-light italic leading-tight text-ember sm:text-4xl">
-          eu nunca confiei em lugar seguro. até você virar o meu.
+          eu nunca acreditei em lugar seguro, até tu virar o meu.
         </p>
       </Reveal>
 
@@ -61,7 +61,7 @@ export function Epilogue() {
           className="mx-auto max-w-4xl font-display font-light italic leading-[1.05] text-ember text-[2.5rem] sm:text-[5.5rem]"
           style={{ textShadow: '0 0 60px rgba(230, 192, 122, 0.2)' }}
         >
-          Eu te amo pra um caralho
+          Eu te amo pra um caralho!
         </p>
       </Reveal>
 

@@ -125,6 +125,13 @@
   background: theme('colors.night.deep');
 }
 
+/* no mobile, encurta o passo de scroll por estrela pra não exigir rolagem infinita */
+@media (max-width: 640px) {
+  #ceu {
+    --scene-h: 34vh;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

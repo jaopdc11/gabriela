@@ -1,16 +1,47 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { AUDIO_DUCK_EVENT } from './AmbientAudio'
 
-/** Distância mínima (px) de um arrastar pra contar como troca de foto. */
+/** Distância mínima (px) de um arrastar pra contar como troca de mídia. */
 const SWIPE_THRESHOLD = 45
 
-/** Carrega automaticamente todas as fotos de src/fotos (ordem alfabética do nome). */
-const modules = import.meta.glob('../fotos/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
+type Media = { src: string; type: 'photo' | 'video'; poster: number }
+
+/**
+ * Carrega automaticamente fotos E vídeos de src/fotos (ordem alfabética do nome).
+ * Pra escolher o frame de capa de um vídeo, ponha o tempo (em segundos) no fim do
+ * nome com "@": ex. "praia@3.5.mp4" mostra o frame de 3,5s. Sem "@", usa ~0,1s.
+ */
+const photoModules = import.meta.glob('../fotos/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
   eager: true,
   import: 'default',
 })
-const PHOTOS = Object.keys(modules)
-  .sort()
-  .map((k) => modules[k] as string)
+const videoModules = import.meta.glob('../fotos/*.{mp4,webm,mov,m4v,MP4,WEBM,MOV,M4V}', {
+  eager: true,
+  import: 'default',
+})
+
+/** Tempo (s) do frame de capa, lido do sufixo "@N" no nome do arquivo. */
+const posterOf = (key: string) => {
+  const m = key.match(/@(\d+(?:\.\d+)?)(?=\.[^.]+$)/)
+  return m ? parseFloat(m[1]) : 0.1
+}
+
+const MEDIA: Media[] = [
+  ...Object.entries(photoModules).map(([key, v]) => ({
+    key,
+    src: v as string,
+    type: 'photo' as const,
+    poster: 0,
+  })),
+  ...Object.entries(videoModules).map(([key, v]) => ({
+    key,
+    src: v as string,
+    type: 'video' as const,
+    poster: posterOf(key),
+  })),
+]
+  .sort((a, b) => a.key.localeCompare(b.key))
+  .map(({ src, type, poster }) => ({ src, type, poster }))
 
 /** Inclinação/flutuação determinística por índice (mesmo mural todo carregamento). */
 const tiltOf = (k: number) => ((k * 53) % 9) - 4 // -4..4 graus
@@ -21,8 +52,21 @@ const tapeOf = (k: number) => ((k * 31) % 15) - 7 // rotação da fita
 const reducedMotion = () =>
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
-/** Uma foto polaroid: revela ao entrar na tela, flutua, e estala em cor no hover. */
-function PhotoCard({ src, k, onOpen }: { src: string; k: number; onOpen: () => void }) {
+/** Selo de "play" sobre a capa de um vídeo. */
+function PlayBadge() {
+  return (
+    <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-night-deep/45 backdrop-blur-[2px] transition-transform duration-300 ease-out group-hover:scale-110">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="ml-0.5 text-star/90" aria-hidden>
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </span>
+    </span>
+  )
+}
+
+/** Uma mídia polaroid: revela ao entrar na tela, flutua, e estala no hover. */
+function MediaCard({ item, k, onOpen }: { item: Media; k: number; onOpen: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
   const [shown, setShown] = useState(() => reducedMotion())
 
@@ -43,6 +87,8 @@ function PhotoCard({ src, k, onOpen }: { src: string; k: number; onOpen: () => v
     return () => io.disconnect()
   }, [])
 
+  const isVideo = item.type === 'video'
+
   return (
     <div
       ref={ref}
@@ -55,7 +101,7 @@ function PhotoCard({ src, k, onOpen }: { src: string; k: number; onOpen: () => v
       <div style={{ animation: `float-y ${durOf(k)}s ease-in-out ${delayOf(k)}s infinite` }}>
         <button
           onClick={onOpen}
-          aria-label={`Ampliar foto ${k + 1}`}
+          aria-label={isVideo ? `Abrir vídeo ${k + 1}` : `Ampliar foto ${k + 1}`}
           className="group relative block w-full rounded-[3px] bg-[#f4efe3] p-2.5 pb-7 shadow-[0_14px_40px_-16px_rgba(0,0,0,0.85)] outline-none transition-all duration-300 ease-out [transform:rotate(var(--r))] hover:z-10 hover:shadow-[0_28px_70px_-18px_rgba(0,0,0,0.9)] hover:[transform:rotate(0deg)_scale(1.05)] focus-visible:[transform:rotate(0deg)_scale(1.05)]"
           style={{ ['--r' as string]: `${tiltOf(k)}deg` }}
         >
@@ -66,13 +112,25 @@ function PhotoCard({ src, k, onOpen }: { src: string; k: number; onOpen: () => v
             style={{ transform: `translateX(-50%) rotate(${tapeOf(k)}deg)` }}
           />
           <span className="relative block overflow-hidden rounded-[2px]">
-            <img
-              src={src}
-              alt={`Nós dois, foto ${k + 1}`}
-              loading="lazy"
-              draggable={false}
-              className="w-full object-cover brightness-[0.92] saturate-[0.9] transition-all duration-500 ease-out group-hover:scale-[1.06] group-hover:brightness-105 group-hover:saturate-100"
-            />
+            {isVideo ? (
+              <video
+                src={`${item.src}#t=${item.poster}`}
+                muted
+                playsInline
+                preload="metadata"
+                draggable={false}
+                className="w-full object-cover brightness-[0.92] saturate-[0.9] transition-all duration-500 ease-out group-hover:scale-[1.06] group-hover:brightness-105 group-hover:saturate-100"
+              />
+            ) : (
+              <img
+                src={item.src}
+                alt={`Nós dois, foto ${k + 1}`}
+                loading="lazy"
+                draggable={false}
+                className="w-full object-cover brightness-[0.92] saturate-[0.9] transition-all duration-500 ease-out group-hover:scale-[1.06] group-hover:brightness-105 group-hover:saturate-100"
+              />
+            )}
+            {isVideo && <PlayBadge />}
             {/* brilho quente + reflexo diagonal no hover */}
             <span className="pointer-events-none absolute inset-0 bg-ember/0 transition-colors duration-300 group-hover:bg-ember/10" />
             <span className="pointer-events-none absolute -inset-y-2 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 transition-all duration-700 ease-out group-hover:left-[120%] group-hover:opacity-100" />
@@ -83,9 +141,29 @@ function PhotoCard({ src, k, onOpen }: { src: string; k: number; onOpen: () => v
   )
 }
 
-/** Mural flutuante das nossas fotos, com abertura em tela cheia ao clicar. */
+/** Vídeo em destaque: toca sozinho, em loop, sem controles nem pause. */
+function LightboxVideo({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    // a abertura veio de um clique → o play com som é permitido
+    ref.current?.play().catch(() => {})
+  }, [src])
+  return (
+    <video
+      ref={ref}
+      src={src}
+      autoPlay
+      loop
+      playsInline
+      className="block max-h-[76vh] max-w-[86vw] object-contain"
+      draggable={false}
+    />
+  )
+}
+
+/** Mural flutuante das nossas fotos e vídeos, com abertura em tela cheia ao clicar. */
 export function PhotoCarousel() {
-  const n = PHOTOS.length
+  const n = MEDIA.length
   const [sel, setSel] = useState<number | null>(null)
   const open = sel !== null
 
@@ -94,7 +172,7 @@ export function PhotoCarousel() {
     [n],
   )
 
-  // arrastar pra os lados troca de foto (mobile): guarda o toque inicial e mede o delta
+  // arrastar pra os lados troca de mídia (mobile): guarda o toque inicial e mede o delta
   const touchStart = useRef<{ x: number; y: number } | null>(null)
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0]
@@ -129,6 +207,18 @@ export function PhotoCarousel() {
     }
   }, [open, go])
 
+  // abaixa a música só enquanto um VÍDEO está em destaque; restaura ao fechar
+  // ou ao trocar pra uma foto
+  useEffect(() => {
+    const duck = open && sel !== null && MEDIA[sel]?.type === 'video'
+    window.dispatchEvent(new CustomEvent(AUDIO_DUCK_EVENT, { detail: { active: duck } }))
+    return () => {
+      window.dispatchEvent(new CustomEvent(AUDIO_DUCK_EVENT, { detail: { active: false } }))
+    }
+  }, [open, sel])
+
+  const current = sel !== null ? MEDIA[sel] : null
+
   return (
     <section id="album" className="relative mx-auto max-w-6xl px-6 py-28 text-center sm:py-36">
       <p className="label text-mist">o nosso álbum</p>
@@ -138,21 +228,21 @@ export function PhotoCarousel() {
 
       {n === 0 ? (
         <p className="mt-12 text-sm leading-relaxed text-mist">
-          (as fotos aparecem aqui automaticamente assim que forem colocadas na pasta{' '}
+          (as fotos e vídeos aparecem aqui automaticamente assim que forem colocados na pasta{' '}
           <span className="font-mono text-star/70">src/fotos/</span>)
         </p>
       ) : (
         <div className="mt-14 gap-5 [column-fill:_balance] columns-2 sm:columns-3 lg:columns-4">
-          {PHOTOS.map((src, k) => (
-            <PhotoCard key={src} src={src} k={k} onOpen={() => setSel(k)} />
+          {MEDIA.map((item, k) => (
+            <MediaCard key={item.src} item={item} k={k} onOpen={() => setSel(k)} />
           ))}
         </div>
       )}
 
-      <p className="mt-12 text-xs text-mist/70">toque numa foto pra ver de perto</p>
+      <p className="mt-12 text-xs text-mist/70">toque pra ver de perto</p>
 
       {/* lightbox / tela cheia */}
-      {open && sel !== null && (
+      {open && sel !== null && current && (
         <div
           className="fixed inset-0 z-[70] flex items-center justify-center bg-night-deep/92 px-4 backdrop-blur-sm"
           onClick={() => setSel(null)}
@@ -174,7 +264,7 @@ export function PhotoCarousel() {
               e.stopPropagation()
               go(-1)
             }}
-            aria-label="Foto anterior"
+            aria-label="Anterior"
             className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:left-8"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -194,13 +284,17 @@ export function PhotoCarousel() {
               className="pointer-events-none absolute inset-0 rounded-[4px] bg-gradient-to-br from-white/40 via-transparent to-black/[0.06]"
             />
             <span className="relative block overflow-hidden rounded-[2px] ring-1 ring-black/10">
-              <img
-                src={PHOTOS[sel]}
-                alt={`Nós dois, foto ${sel + 1}`}
-                className="block max-h-[76vh] max-w-[86vw] object-contain"
-                draggable={false}
-              />
-              {/* vinheta suave nas bordas da foto */}
+              {current.type === 'video' ? (
+                <LightboxVideo src={current.src} />
+              ) : (
+                <img
+                  src={current.src}
+                  alt={`Nós dois, foto ${sel + 1}`}
+                  className="block max-h-[76vh] max-w-[86vw] object-contain"
+                  draggable={false}
+                />
+              )}
+              {/* vinheta suave nas bordas */}
               <span
                 aria-hidden
                 className="pointer-events-none absolute inset-0 shadow-[inset_0_0_60px_-20px_rgba(0,0,0,0.5)]"
@@ -216,7 +310,7 @@ export function PhotoCarousel() {
               e.stopPropagation()
               go(1)
             }}
-            aria-label="Próxima foto"
+            aria-label="Próxima"
             className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-ember/25 bg-night-soft/60 text-star/80 backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star sm:right-8"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>

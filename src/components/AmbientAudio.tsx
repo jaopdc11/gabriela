@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 const TRACK_SRC = '/musica.mp3'
 /** Volume de fundo (0–1), suave pra não competir com a leitura. */
 const VOLUME = 0.45
+/** Volume rebaixado enquanto um vídeo em destaque toca. */
+const DUCKED_VOLUME = 0.06
+/** Evento pra abaixar/restaurar a música (disparado ao abrir/fechar vídeo). */
+export const AUDIO_DUCK_EVENT = 'audio-duck'
 
 /**
  * Trilha de fundo em loop. Tenta tocar assim que o site abre; se o navegador
@@ -45,10 +49,33 @@ export function AmbientAudio() {
     audio.addEventListener('play', onPlay)
     audio.addEventListener('pause', onPause)
 
+    // abaixa/restaura o volume suavemente quando um vídeo em destaque abre/fecha
+    let fadeRaf = 0
+    const fadeTo = (target: number) => {
+      cancelAnimationFrame(fadeRaf)
+      const step = () => {
+        const diff = target - audio.volume
+        if (Math.abs(diff) < 0.01) {
+          audio.volume = target
+          return
+        }
+        audio.volume = Math.min(1, Math.max(0, audio.volume + diff * 0.15))
+        fadeRaf = requestAnimationFrame(step)
+      }
+      step()
+    }
+    const onDuck = (e: Event) => {
+      const active = (e as CustomEvent<{ active: boolean }>).detail?.active
+      fadeTo(active ? DUCKED_VOLUME : VOLUME)
+    }
+    window.addEventListener(AUDIO_DUCK_EVENT, onDuck)
+
     return () => {
       removeGestureListeners()
+      cancelAnimationFrame(fadeRaf)
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('pause', onPause)
+      window.removeEventListener(AUDIO_DUCK_EVENT, onDuck)
     }
   }, [])
 

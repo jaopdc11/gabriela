@@ -16,104 +16,100 @@ export const milestones: Milestone[] = [
   {
     date: new Date(2026, 5, 6),
     title: 'A gente se conheceu',
-    description: `Eu não tava nem um pouco a fim de ir nessa festa, zero mesmo. Mas tinha uma voz insistindo no meu ouvido, e como eu confio na minha espiritualidade, acabei indo. Cheguei já de saco cheio, meu amigo me chamou pra vazar e a voz mandou eu ficar. Fiquei.
-Meia hora depois eu já tava de papo com você, morrendo de medo de você ser areia demais pro meu caminhão. Rolou aquele silêncio constrangedor, eu virei pra falar alguma coisa e você já tava me olhando: "tu ficaria comigo?". Travei, falei que sim, e cara, que beijo foi aquele. Fiquei tão bobo que nem o teu Insta eu consegui pedir, e você vazou atrás da Andressa.
-No dia seguinte passei o dia todo me xingando, torrando a paciência do Matheus. Aí você me mandou solicitação pra eu te seguir e eu tremi na base. Tava jogando sinuca com os amigos e de tão nervoso precisei de ajuda até pra te responder.`,
+    description: `Eu quase não fui nessa festa. Tava sem a mínima vontade, morrendo de preguiça, e hoje eu tremo se pensar nisso, porque foi uma voz insistindo no meu ouvido que me fez ir e ficar. E eu, que confio na minha espiritualidade, fui. Ela já sabia de tudo
+Quando eu te vi, meu medo foi de ti ser areia demais pro meu caminhão. Mas mesmo assim fiquei pensando em como chegar em ti, porque honestamente eu não sei fazer isso KKKKKKKKKK. Quando eu finalmente tive culhão de chegar, tu virou e perguntou se eu ficaria contigo. Eu travei por dentro de um jeito que eu nunca tinha travado na vida. E porra, aquele beijo me desmontou inteiro
+O que tu não fazia a menor ideia é o tamanho do meu desespero no dia seguinte. Fiquei me xingando o dia todo, torrando a paciência do Matheus, achando que eu tinha deixado escapar a melhor coisa que já tinha chegado perto de mim. E puta merda, qaundo a tua solicitação chegou, minha mão tremeu de verdade. Eu ainda não sabia, mas era ali que a minha vida começava de verdade`,
     x: 5,
-    y: 28,
+    y: 26,
   },
   {
     date: new Date(2026, 5, 13),
     title: 'A primeira vez, só nós dois',
-    description: `Eu tinha um compromisso com um amigo pra resolver uma treta, mas meti um migué e fui pra Univali. Na real só queria dar um jeito de te ver de novo. Não te achei, mas foi esse amigo que me deu coragem pra te chamar pra sair no Quinta (um lugar meio ruim, confesso, mas eu mal te conhecia, então arrisquei).
-Você me deixou DOZE minutos no vácuo. Doze. Eu tremendo, achando que tinha estragado tudo de afobado. Aí do nada você aceitou, e eu GRITEI. Meu amigo caiu na risada. Foi numa terça, e a gente saiu na sexta.
-Esse rolê foi incrível, foi quando deu pra conversar de verdade. Você me ganhou de vez quando pediu pra eu te explicar umas coisas da minha umbanda, e eu fiquei olhando os teus olhinhos e o teu sorrisinho me ouvindo. Foi ali que eu me apaixonei, uma semana depois de te conhecer. Ainda joguei sinuca fazendo o possível pra te deixar ganhar (não rolou), e despistei dois amigos que brotaram do nada quando vi que você ficou meio sem graça.`,
-    x: 12,
+    description: `Eu inventei um compromisso e fui pra Univali só pra ter alguma chance de te ver de novo. Nem te achei, mas achei coragem pra te chamar pra sair, e isso já era muito pra mim
+Aí vieram doze minutos de vácuo (ainda não superei) que pareceram a minha vida inteira. Doze. Eu já me achando um idiota afobado que tinha estragado tudo antes de começar. Quando tu aceitou, eu gritei, não teve como segurar, e meu amigo riu da minha cara como se eu fosse o maior otário do planeta KKKKKKKKKKKK
+Mas o que eu preciso mesmo que tu saiba é o instante exato em que eu me encantei por ti. Não foi numa risada nem num beijo. Foi quando tu me pediu pra explicar da minha umbanda e ficou ali, me ouvindo, com aquele sorrisinho, os teus olhinhos em mim. Uma semana depois de te conhecer já foi o suficiente pra eu me apaixonar nos teus olhos. Eu ainda tentei te deixar ganhar na sinuca, disfarçado, só pra te ver feliz. E depois tu acabou comigo pra eu aprender KKKKKKKKKKKKKK`,
+    x: 13,
     y: 23,
   },
   {
     date: new Date(2026, 5, 15),
-    title: 'O dia da praia (a gente se apaixonando)',
-    description: `No Quinta você tinha soltado que gostava de praia e de bike. De indireta aquilo não teve nada kkk, e eu peguei a deixa e dei a ideia depois. E a gente foi.
-Minha bike tava toda fudida desde que me atropelaram no começo do ano, nunca arrumei, e tava pesadíssima. Mas fui assim mesmo, morrendo de pedalar e sem reclamar nada. Lá pela metade do caminho você trocou de bike comigo e finalmente entendeu que eu não tava sendo fresco, a bike era um horror mesmo.
-A gente chegou, sentou e ficou ali: conversa, baralho, um rolê de casal já, mesmo a gente ainda nem sendo. Não fomos pra se pegar nem nada, e foi isso que deixou o dia tão bom. Ah, e eu perdi de novo, 7 a 2 no pife, fiquei puto brincando. Guardei as cartas usando a derrota de desculpa ("cansei de perder"), mas na real era só pra te abraçar. Ficamos coladinhos olhando o mar.
-Aí eu soltei uma cantadinha e te beijei. Foi incrível. Depois a gente deitou na areia de conchinha, vendo o mar, e você dormiu nos meus braços. Eu fiquei em choque, pqp, com a confiança de você dormir ali, tão tranquila, do meu lado.
-Foi nesse dia também que eu aprendi uma coisa que eu não vou esquecer nunca: que o teu "não" é sagrado, e que você nunca precisa ter medo de me dizer. A gente conversou sobre isso e eu fiz questão de deixar bem claro.
-Foi na praia, nesse dia, que a gente se apaixonou de vez, um pelo outro.`,
-    x: 18,
-    y: 26,
+    title: 'O dia da praia',
+    description: `Tu soltou que gostava de praia e de bike no quinta aula, e eu peguei a deixa na hora, porque naquele ponto qualquer desculpa pra estar perto de ti já bastava. Fui com a minha bike toda quebrada, morrendo pra pedalar, e não reclamei de nada, porque do teu lado valia a pena perder o joelho KKKKKKKKKKKKK
+O que ficou gravado em mim daquele dia não foi o beijo. Foi tu dormindo nos meus braços, na areia, olhando o mar antes de apagar. Eu fiquei em choque com a confiança de ti se entregar assim, tão tranquila, do meu lado. Nunca ninguém tinha me confiado esse sossego
+E foi nesse dia que eu decidi uma coisa que eu carrego até hoje: que o teu "não" é sagrado, e que tu nunca, nunca vai precisar ter medo de me dizer. Foi ali, contigo dormindo em mim, que eu me apaixonei de vez`,
+    x: 21,
+    y: 19,
   },
   {
     date: new Date(2026, 5, 20),
     title: 'A primeira noite na sua casa',
-    description: `Eu tava doido pra ir na tua casa, sem segunda intenção nenhuma. Só queria conhecer o teu cantinho, o teu mundinho. Até então eu só parava na tua esquina, nem sabia direito onde você morava, e te respeitei demais por isso. Quando ouvi o teu áudio me convidando eu quase chorei, e fui na hora.
-Antes disso a gente se encontrou no fim do dia e foi no cinema debaixo de uma chuva do caramba. Vimos "Todo Mundo em Pânico 6" (eu nunca tinha visto os outros cinco), mas a tua risada é tão gostosa que a gente acabou rindo o filme inteiro.
-Cheguei na tua casa com medo de te incomodar, e quase fui embora de vergonha quando derrubei a Ice na tua toalha, de puro nervoso. A gente jogou baralho e eu apanhei, porque você SEMPRE me ganha no pife (que saco kkk). Depois a gente foi deitar, e eu nunca tinha tido uma noite tão tranquila na vida. Dormir no teu calor e no teu cheiro foi a melhor coisa que me aconteceu em muito tempo. Fiquei viciado.`,
-    x: 25,
-    y: 17,
+    description: `Eu morria de vontade de conhecer a tua casa, e juro que era sem segunda intenção nenhuma. Eu só queria ver o teu cantinho, o teu mundinho, o lugar onde tu existe quando eu não tô olhando. Quando chegou o teu áudio me convidando, eu quase chorei
+Cheguei tão nervoso que derrubei a Ice na tua toalha e quase fui embora de pura vergonha. Besta, mas eu tava com medo de te incomodar, de não caber ali. Até agora me dá uma gastura quando lembro da garrafa caindo KKKKKKKKKKK
+E aí a gente deitou. Eu nunca tinha tido uma noite tão tranquila na vida inteira. Dormir no teu calor e no teu cheiro apagou um barulho que morava em mim fazia tempo, um barulho que eu nem sabia mais que existia. Foi essa noite que eu fiquei viciado em ti, e eu nunca mais quis desviciar`,
+    x: 29,
+    y: 15,
   },
   {
     date: new Date(2026, 5, 25),
     title: 'A primeira tempestade',
-    description: `Foi uma coisa que você fez, e depois me contou, que me machucou pra caramba. Eu tava no escritório e precisei ir pro banheiro. Vou ser sincero, chorei ali dentro. Doeu tanto que passou pela minha cabeça não falar mais com você.
-Você propôs a gente conversar pessoalmente, e sinceramente eu nem queria te ver naquele dia. Cheguei em casa, firmei uma vela pra Oxóssi e perguntei pro meu pai se eu devia ir. Ele foi direto: devia. Então eu fui.
-Foi ali que eu chorei na tua frente pela primeira vez, e vi o teu olho brilhar também, segurando o choro. O tempo todo eu só queria te abraçar e nunca mais te soltar, mas antes eu precisava te ouvir. Doeu, doeu muito. Mas eu te amo demais, e a gente atravessou isso junto.`,
-    x: 32,
-    y: 20,
+    description: `A situação da foto me machucou de um jeito que eu não esperava sentir tão cedo. Eu tava no escritório e chorei escondido no banheiro, e por um instante, eu vou ser sincero, passou pela minha cabeça não falar mais contigo. Idiota, cogitei. Maldito padrão de fugir
+Eu nem queria te ver naquele dia. Cheguei em casa, firmei uma vela pra meu pai Oxóssi e perguntei se eu devia ir. Ele foi direto: "vai. agora.". Então eu fui, mais pela fé do que pela vontade, confesso
+E foi ali que eu chorei na tua frente pela primeira vez, e vi teu olho brilhar segurando o choro também. O tempo todo, mesmo doendo, a única coisa que eu queria era correr pra te abraçar e nunca mais soltar. Foi nessa tempestade que eu aprendi uma coisa sobre mim: que te amar já era maior que a dor. E que eu ia atravessar qualquer temporal, desde que fosse contigo, e por nós`,
+    x: 37,
+    y: 11,
   },
   {
     date: new Date(2026, 5, 26),
     title: 'O primeiro "eu te amo"',
-    description: `A gente já vinha há dias rondando as "três palavrinhas", aquela vontade de soltar toda vez que se via, mas sempre segurando. Até que numa madrugada você me acordou. E como é só do teu lado que eu durmo fundo de verdade, você perguntou "tá acordado?" e eu, de tanto sono, respondi "eu tava, fala", totalmente sem sentido. A gente riu por um tempão disso.
-Aí, do nada, você falou: "eu amo você, e tenho medo de te perder". Meu olho encheu na hora, e eu não parei mais de falar. De você, de estar com você, de dormir com você, do teu cheiro, de tudo.`,
-    x: 38,
-    y: 11,
+    description: `A gente já vinha dias rondando as três palavrinhas, aquela vontade entalada na garganta toda vez que se via, sempre segurando por medo de ser cedo
+De madrugada tu me acordou. E como é só do teu lado que eu durmo fundo de verdade, eu respondi todo lerd, no maior sono, e a gente ainda ri disso
+Aí tu falou: "eu amo você, e tenho medo de te perder". Meu olho encheu na hora. Eu não sabia que dava pra sentir tanta coisa de uma vez só. E o que eu nunca soube te explicar direito é que aquele teu medo era o meu também. Eu também morro de medo de te perder. É por isso que eu cuido da gente com tanto cuidado, como quem segura uma coisa rara nas mãos. Tu é meu tesouro`,
+    x: 45,
+    y: 9,
   },
   {
     date: new Date(2026, 5, 27),
     title: 'Conhecemos as mães',
-    description: `Você conheceu a minha e eu conheci a sua no mesmo dia. Eu tava morrendo de nervoso pra encarar a tua mãe, então, de surpresa e sem te avisar, te joguei pra conhecer a minha primeiro. Você ficou toda tímida, e essa foi a minha vingancinha, que valeu cada segundo kkk.
-No fim eu ainda voltei pra casa com o teu moletom, e você ficou com uma camisa minha. Não larguei aquele moletom até o teu cheiro sumir dele. E mesmo agora, sem ele, eu ainda sinto esse cheiro só de pensar em você.`,
-    x: 45,
-    y: 14,
+    description: `Eu tava nervoso pra caralho pra encarar a tua mãe. Tanto que, de sacanagem, te joguei de surpresa pra conhecer a minha primeiro, sem te avisar, só pra adiar o meu próprio pavor e equilibrar um pouco o jogo KKKKKKKKKKK. Tu ficou toda tímida, e eu me diverti demais com isso, vou ter que admitir a minha vingancinha rs
+Mas o que acabou comigo mesmo aquele dia não foi o cagaço, foi o teu moletom que eu trouxe pra casa. Eu não larguei aquilo até o teu cheiro sumir de vez, e sofri quando sumiu. Dormi mal pra cacete KKKKKKKKKKK
+Naquele dia eu senti, sem saber colocar em palavras, que a coisa tava ficando séria do jeito bom, do jeito que eu queria pra vida. A gente começou a se misturar, a virar parte da história um do outro. E eu quis isso com todas as forças.`,
+    x: 53,
+    y: 9,
   },
   {
     date: new Date(2026, 6, 11),
-    title: 'A festa TYC (nosso primeiro rolê fora)',
-    description: `Foi o nosso primeiro rolê pra fora, juntos, e só por isso já entrou pra história. A gente foi na van da atlética, todo coladinho, escolhendo as músicas pra postar as nossas fotos no Insta. Foi a primeira vez que a gente se assumiu assim, escancarado, com rosto e tudo (nas outras eu nunca aparecia direito). Isso mexeu demais comigo.
-A festa em si foi tranquila. Dediquei um pagode pra você, a gente dançou, e de vez em quando eu dava um pulo pra ver os amigos. Nada de mais, mas teve duas coisas que ficaram cravadas em mim: a gente dançando agarradinho e se beijando na frente de todo mundo, até das tuas amigas. Eu ali, sem esconder de ninguém que era teu.
-Você acabou bebendo além da conta e passou mal, então a gente voltou mais cedo. Foi também a primeira vez que você me viu fumando, e eu confesso que me senti meio mal com isso. Mas no fim o que ficou foi você, podre de bêbada, dormindo do meu lado. E eu do lado, com a mesma sensação de sempre: é aqui que eu quero ficar.`,
-    x: 52,
-    y: 8,
+    title: 'A TYC',
+    description: `A festa em si foi ótima, mas não é dela que eu lembro. O que mexeu comigo de verdade foi a gente se assumir pela primeira vez escancarado, com rosto e tudo nas fotos, na van, escolhendo as músicas juntos. Eu, sem esconder de ninguém que era teu. E tu, sem esconder de ninguém que era minha
+A gente dançou agarrado e se beijou na frente de todo mundo, das tuas amigas, de geral. E eu senti um orgulho que eu não sabia nomear, de estar ali sendo teu na cara do mundo
+Foi também a primeira vez que tu me viu fumando, e isso me deu um aperto, um medinho de te decepcionar que eu carreguei calado. Mas tu me entendeu. Tu acabou passando mal e a gente voltou mais cedo, e mesmo assim o que ficou de tudo foi tu dormindo do meu lado. É sempre assim: não importa pra onde a noite vá, o que eu quero é que ela temine contigo`,
+    x: 61,
+    y: 11,
   },
   {
     date: new Date(2026, 6, 13),
     title: 'A bênção nas alianças',
-    description: `Esse foi um dos maiores passos que eu já dei por nós. Peguei as alianças de namoro que eu já tinha comprado e levei lá no terreiro, pro Seo Tranca Rua das Almas, o Exu da minha mãe de santo, cruzar e abençoar. Era pra blindar o nosso namoro de olho gordo, de fofoca, de tudo que pudesse tentar separar a gente.
-E ele fez. O Seo Tranca Rua das Almas deu a bênção nas nossas alianças.
-Ali eu senti uma coisa que lá no fundo eu já sabia, mas que naquele momento virou certeza absoluta: que a gente tem que estar junto mesmo. Porque se não tivesse caminho pra nós, ele JAMAIS teria feito aquilo. Jamais. Saí de lá mais feliz, mais confiante e mais seguro do que eu já tinha me sentido na vida. E, por fundamento, te contei tudo assim que botei o pé pra fora do terreiro.`,
-    x: 58,
-    y: 13,
+    description: `Esse foi um dos maiores passos que eu já dei por nós, e talvez tu nunca tenha medido o tamanho dele. Peguei as alianças de namoro que eu já tinha comprado e levei no terreiro, pro Seo Tranca Rua das Almas, da minha mãe de santo, cruzar e abençoar. Pra blindar a gente de olho gordo, de fofoca, de tudo que pudesse tentar separar. Lembrei do teu medo, na naquela quinta feira
+E assim ele fez. Deu a bênção das encruzilhadas nas nossas alianças
+Ali dentro eu senti uma coisa que lá no fundo eu já sabia, mas que naquele instante virou certeza absoluta: que a gente TEM que estar junto. Porque se não tivesse caminho pra nós, ele jamais, jamais teria feito aquilo. Eu saí de lá o homem mais seguro do mundo, e te contei tudo assim que botei o pé pra fora do terreiro, porque segredo contigo eu não sei ter (e também é de bom tom avisar que fiz macumba pra gente KKKKKKKKK)`,
+    x: 69,
+    y: 14,
   },
   {
     date: new Date(2026, 6, 19),
     title: 'A noite que o show não rolou (e foi perfeita)',
-    description: `Era pra ser o show do Alexandre Pires, o nosso primeiro show juntos. Mas a gente ficou agarradinho o dia inteiro, se atrasou, e quando fomos nos arrumar já era tarde demais. O Uber tava quase 100 conto, e a gente só se olhou e desistiu. Começamos a pensar no que fazer.
-Você queria me levar num café pra gente comer, mas não achamos nada muito legal. Aí eu sugeri a gente só comprar umas coisinhas e ficar vendo um filme agarradinho, e o sorriso que você deu me derreteu todo. Compramos tudo, chegamos em casa e no fim decidimos ir pra praia primeiro.
-Fomos pra praia à noite, sentamos e conversamos. E esse papo foi MUITO importante. Eu te contei toda a minha história com a depressão, os meus traumas, as minhas tentativas, tudo. E você me ouviu sem me julgar nenhuma vez. Eu vi os teus olhos marejarem, e foi isso que me quebrou, chorei por ver você assim, não pela história kkkkkk. Fiz questão de você entender que eu sou grato pela minha vida, que você não precisa se preocupar comigo, e a gente ficou tranquilo. Depois você me contou a tua história, e eu não vou mentir que não fiquei com raiva, porque fiquei, muito, da tua mãe e mais ainda da tua tia e da tua prima. Me deu um ódio. Mas enfim, a gente ainda provou uns chocolates estranhos, e no fim até que eu gostei.
-Aí eu chorei de novo, mas dessa vez porque a gente foi firmar uma vela pra Iemanjá. A coitada não conseguia acender de jeito nenhum, mesmo eu ajudando, e eu te acalmei dizendo que podia firmar em casa que tava tudo certo. Ver você batendo cabeça pra Iemanjá me fez um bem que eu não sei explicar. Eu vi os espíritos das águas ali na praia presenciando aquilo, mas não te falei nada pra não te assustar. Recebi uma irradiação do meu marinheiro e só senti a certeza de que a gente se ama, e de que a mãe d'água tinha dado a bênção dela pro nosso amor.
-Voltamos pra casa pedalando, eu quase morrendo do joelho mas segui firme. Você tirava os pés do pedal pra balançar as pernas e eu achava a coisa mais linda do mundo, eu amo te ver, cada detalhe teu. Chegando em casa eu firmei uma vela de erê pra levantar o astral da tua casa, e senti a energia irradiar em mim, E EM VOCÊ TAMBÉM. Eu vi no teu olhar que você tava irradiando, foi lindo demais. Você reparou que eu tava todo mexido e a gente riu pra caramba kkkkkk.
-Depois deitamos pra ver o filme e você já tava quase dormindo. Aproveitei que no dia seguinte, por conta do meu preceito, a gente não ia poder se tocar, e tirei o filme só pra gente ficar agarradinho. Me declarei pra você, como eu faço todo santo dia, e a gente dormiu ali (era pra eu ter ido pra casa) kkkkkk. O show não rolou, mas essa noite foi uma das mais importantes pra mim.`,
-    x: 65,
-    y: 11,
+    description: `Era pra ser o nosso primeiro show, o Alexandre Pires. Mas a gente ficou agarrado o dia inteiro, se atrasou, o Uber tava caríssimo, e a gente só se olhou e desistiu sem pena nenhuma. E graças a deus, porque essa acabou virando uma das noites mais importantes da minha vida
+Na praia, no escuro, eu te contei tudo. A depressão, os traumas, as tentativas, coisas que eu não conto pra quase ninguém no mundo. E tu me ouviu sem me julgar uma única vez. Eu vi teu olho marejar, e foi isso que me quebrou: eu chorei por te ver sofrendo por mim, não pela minha história. Precisei que tu entendesse que eu sou grato pela minha vida, que tu não precisa carregar medo por mim
+O que eu não te falei na hora, pra não te assustar, é que eu senti os espíritos das águas ali na praia, presenciando a gente. Quando tu bateu cabeça pra Iemanjá me deu uma paz que eu não sei explicar, e eu soube que a mãe d'água tinha abençoado o nosso amor. Depois, na tua casa, firmei uma vela de erê e vi a energia irradiar em mim E EM VOCÊ, vi no teu olhar. Foi lindo. Voltamos pedalando, meu joelho quase morrendo, e eu te olhando balançar as perninhas achando aquilo a coisa mais linda que existe. Eu amo cada detalhe teu, até os que tu acha bobos`,
+    x: 77,
+    y: 16,
   },
   {
     date: new Date(2026, 6, 20),
-    title: 'O meu amaci (você no meu terreiro)',
-    description: `Essa é uma das estrelas mais importantes de todas, o dia em que você pisou no meu terreiro, no meu amaci, o meu momento mais sagrado, o mais meu que existe. Te levar pra lá foi te abrir a minha fé inteira.
-No fim foi tudo tranquilo, você chegou, ficou até o final e me viu incorporado. Pelo que você me contou depois, parece que não te dei passe, mas eu sei o que senti: quando a minha Oxum baixou, senti ela mandando um axé pra você. A gente ainda comeu bolo do terreiro, e você foi falar com a minha mãe de santo sobre o Seo Tranca Rua das Almas, pra agradecer ele. Coisa simples, sem muito o que contar.
-Mas pra mim foi significativo DEMAIS. Não pelo que aconteceu, e sim pelo fato de ser VOCÊ ali, entrando no meu mundinho, no lugar mais meu que existe. Foi você pisando no meu chão sagrado. E isso eu não esqueço nunca.`,
-    x: 72,
-    y: 19,
+    title: 'O meu amaci',
+    description: `Essa é uma das coisas mais minhas que existem no mundo, e eu escolhi dividir contigo. Te levar pro meu amaci foi te abrir a minha fé inteira, o meu momento mais sagrado, o lugar mais meu que existe.
+Tu me disse depois que achou que não tinha recebido passe de mim. Mas eu sei o que eu senti: quando a minha Oxum baixou, ela mandou um axé pra ti, e isso pra mim vale mais do que qualquer coisa que a gente pudesse ver com os olhos. Ora Ye Ye ô!
+Porque o que me marcou de verdade não foi o que aconteceu naquele dia. Foi ser TU ali, pisando no meu chão sagrado, entrando no lugar mais íntimo que eu tenho. Tem gente que namora anos e nunca chega nem perto disso. Eu te levei em poucas semanas, porque contigo eu simplesmente não tive medo de me abrir por inteiro`,
+    x: 85,
+    y: 18,
   },
 ]
