@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AUDIO_DUCK_EVENT } from './AmbientAudio'
+import { connectVideo } from '../audioBus'
 
 /** Distância mínima (px) de um arrastar pra contar como troca de mídia. */
 const SWIPE_THRESHOLD = 45
@@ -155,8 +156,14 @@ function MediaCard({ item, k, onOpen }: { item: Media; k: number; onOpen: () => 
 function LightboxVideo({ src }: { src: string }) {
   const ref = useRef<HTMLVideoElement>(null)
   useEffect(() => {
-    // a abertura veio de um clique → o play com som é permitido
-    ref.current?.play().catch(() => {})
+    const el = ref.current
+    if (!el) return
+    // roteia o áudio do vídeo pelo mesmo AudioContext da música → o vídeo não
+    // rouba o foco e a música só abaixa (não pausa). a abertura veio de um clique,
+    // então o play com som é permitido.
+    const disconnect = connectVideo(el)
+    el.play().catch(() => {})
+    return () => disconnect?.()
   }, [src])
   return (
     <video

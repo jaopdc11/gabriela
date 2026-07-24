@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
+import { connectMusic, duckMusic, MUSIC_VOLUME } from '../audioBus'
 
 /** Playlist de fundo (dentro de /public), tocada em ordem e em loop no fim. */
 const TRACKS = ['/musica.mp3', '/musica2.mp3', '/musica3.mp3']
-/** Volume de fundo (0–1), suave pra não competir com a leitura. */
-const VOLUME = 0.45
-/** Volume rebaixado enquanto um vídeo em destaque toca. */
+/** Volume rebaixado (fallback sem Web Audio) enquanto um vídeo toca. */
 const DUCKED_VOLUME = 0.06
 /** Evento pra abaixar/restaurar a música (disparado ao abrir/fechar vídeo). */
 export const AUDIO_DUCK_EVENT = 'audio-duck'
 
 /**
- * Trilha de fundo em loop. Tenta tocar assim que o site abre; se o navegador
- * bloquear o autoplay com som (quase sempre bloqueia), a música entra sozinha
- * no primeiro gesto do usuário (toque, clique, tecla ou rolagem). Um botão
- * discreto no canto permite pausar/retomar a qualquer momento.
+ * Trilha de fundo em playlist. Tenta tocar assim que o site abre; se o navegador
+ * bloquear o autoplay com som (quase sempre bloqueia), a música entra sozinha no
+ * primeiro gesto do usuário. O áudio é roteado por um AudioContext único (ver
+ * audioBus) pra que o som dos vídeos NÃO pause a música — só abaixe o volume dela.
+ * Um botão discreto no canto permite pausar/retomar.
  */
 export function AmbientAudio() {
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -22,8 +22,11 @@ export function AmbientAudio() {
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    audio.volume = VOLUME
     if (!audio.src) audio.src = TRACKS[0]
+
+    // liga ao barramento Web Audio; se rolar, o ganho fica com o bus (volume=1)
+    const usingBus = connectMusic(audio)
+    audio.volume = usingBus ? 1 : MUSIC_VOLUME
 
     // ao acabar uma faixa, passa pra próxima; depois da última, volta pra primeira
     let idx = 0
@@ -59,9 +62,10 @@ export function AmbientAudio() {
     audio.addEventListener('play', onPlay)
     audio.addEventListener('pause', onPause)
 
-    // abaixa/restaura o volume suavemente quando um vídeo em destaque abre/fecha
+    // duck: com Web Audio, abaixa o ganho (sem pausar). Sem Web Audio, fallback
+    // suave no volume do elemento.
     let fadeRaf = 0
-    const fadeTo = (target: number) => {
+    const fadeVolumeTo = (target: number) => {
       cancelAnimationFrame(fadeRaf)
       const step = () => {
         const diff = target - audio.volume
@@ -75,8 +79,9 @@ export function AmbientAudio() {
       step()
     }
     const onDuck = (e: Event) => {
-      const active = (e as CustomEvent<{ active: boolean }>).detail?.active
-      fadeTo(active ? DUCKED_VOLUME : VOLUME)
+      const active = !!(e as CustomEvent<{ active: boolean }>).detail?.active
+      if (usingBus) duckMusic(active)
+      else fadeVolumeTo(active ? DUCKED_VOLUME : MUSIC_VOLUME)
     }
     window.addEventListener(AUDIO_DUCK_EVENT, onDuck)
 
@@ -99,9 +104,8 @@ export function AmbientAudio() {
 
   return (
     <>
-      {/* preload="none": não baixa nada na abertura (competia com as fotos no mobile);
-          o play() no primeiro gesto dispara o download da faixa atual. A ordem/loop
-          da playlist é controlada no efeito (evento 'ended'). */}
+      {/* preload="none": não baixa nada na abertura; o play() no primeiro gesto
+          dispara o download da faixa atual. Ordem/loop no efeito (evento 'ended'). */}
       <audio ref={audioRef} preload="none" />
       <button
         onClick={toggle}
@@ -112,10 +116,7 @@ export function AmbientAudio() {
         {playing ? (
           // som ligado: ondinhas
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path
-              d="M4 9v6h4l5 4V5L8 9H4z"
-              fill="currentColor"
-            />
+            <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
             <path
               d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"
               stroke="currentColor"
