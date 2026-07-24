@@ -150,13 +150,13 @@ export function NightJourney() {
       className="relative"
     >
       <div className="sticky top-0 flex h-[100svh] flex-col overflow-hidden">
-        <p className="label absolute left-1/2 top-[9vh] -translate-x-1/2 text-mist">
+        <p className="label absolute left-1/2 top-[3vh] -translate-x-1/2 text-mist sm:top-[9vh]">
           a nossa constelação
         </p>
 
         {/* céu / constelação */}
         <svg
-          className="absolute inset-x-[8vw] top-[6vh] h-[20vh] sm:top-[15vh] sm:h-[46vh]"
+          className="absolute inset-x-[8vw] top-[11vh] h-[20vh] sm:top-[15vh] sm:h-[46vh]"
           viewBox="0 0 100 44"
           preserveAspectRatio="xMidYMid meet"
           aria-hidden
@@ -516,7 +516,7 @@ export function NightJourney() {
               <h2 className="mt-2 font-display text-[1.7rem] font-light leading-tight text-star sm:mt-3 sm:text-5xl">
                 {PROPOSAL.title}
               </h2>
-              <div className="no-scrollbar mx-auto mt-3 max-h-[38vh] max-w-2xl overflow-y-auto overscroll-contain rounded-2xl bg-night/55 px-4 py-3 backdrop-blur-[2px] sm:max-h-[42vh] sm:px-6 sm:py-4">
+              <div className="no-scrollbar mx-auto mt-3 max-h-[38vh] max-w-2xl overflow-y-auto overscroll-contain rounded-2xl bg-night/75 px-4 py-3 backdrop-blur-sm sm:max-h-[42vh] sm:px-6 sm:py-4">
                 <p className="whitespace-pre-line text-[0.8rem] leading-[1.55] text-mist sm:text-[0.95rem] sm:leading-relaxed">
                   {highlightSacred(PROPOSAL.description)}
                 </p>
@@ -538,7 +538,7 @@ export function NightJourney() {
               <h2 className="mt-2 font-display text-[1.7rem] font-light leading-tight text-star sm:mt-3 sm:text-5xl">
                 {milestones[active].title}
               </h2>
-              <div className="no-scrollbar mx-auto mt-3 max-h-[42vh] max-w-2xl overflow-y-auto overscroll-contain rounded-2xl bg-night/55 px-4 py-3 backdrop-blur-[2px] sm:max-h-[46vh] sm:px-6 sm:py-4">
+              <div className="no-scrollbar mx-auto mt-3 max-h-[42vh] max-w-2xl overflow-y-auto overscroll-contain rounded-2xl bg-night/75 px-4 py-3 backdrop-blur-sm sm:max-h-[46vh] sm:px-6 sm:py-4">
                 <p className="whitespace-pre-line text-[0.8rem] leading-[1.55] text-mist sm:text-[0.95rem] sm:leading-relaxed">
                   {highlightSacred(milestones[active].description)}
                 </p>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
-/** Nome do arquivo de música dentro de /public. */
-const TRACK_SRC = '/musica.mp3'
+/** Playlist de fundo (dentro de /public), tocada em ordem e em loop no fim. */
+const TRACKS = ['/musica.mp3', '/musica2.mp3', '/musica3.mp3']
 /** Volume de fundo (0–1), suave pra não competir com a leitura. */
 const VOLUME = 0.45
 /** Volume rebaixado enquanto um vídeo em destaque toca. */
@@ -23,6 +23,16 @@ export function AmbientAudio() {
     const audio = audioRef.current
     if (!audio) return
     audio.volume = VOLUME
+    if (!audio.src) audio.src = TRACKS[0]
+
+    // ao acabar uma faixa, passa pra próxima; depois da última, volta pra primeira
+    let idx = 0
+    const onEnded = () => {
+      idx = (idx + 1) % TRACKS.length
+      audio.src = TRACKS[idx]
+      audio.play().catch(() => {})
+    }
+    audio.addEventListener('ended', onEnded)
 
     const start = () => {
       audio
@@ -73,6 +83,7 @@ export function AmbientAudio() {
     return () => {
       removeGestureListeners()
       cancelAnimationFrame(fadeRaf)
+      audio.removeEventListener('ended', onEnded)
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('pause', onPause)
       window.removeEventListener(AUDIO_DUCK_EVENT, onDuck)
@@ -88,9 +99,10 @@ export function AmbientAudio() {
 
   return (
     <>
-      {/* preload="none": não baixa os ~4 MB na abertura (competia com as fotos no
-          mobile); o play() no primeiro gesto dispara o download na hora certa. */}
-      <audio ref={audioRef} src={TRACK_SRC} loop preload="none" />
+      {/* preload="none": não baixa nada na abertura (competia com as fotos no mobile);
+          o play() no primeiro gesto dispara o download da faixa atual. A ordem/loop
+          da playlist é controlada no efeito (evento 'ended'). */}
+      <audio ref={audioRef} preload="none" />
       <button
         onClick={toggle}
         aria-label={playing ? 'Pausar música' : 'Tocar música'}
