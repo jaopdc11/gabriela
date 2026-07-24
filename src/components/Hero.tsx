@@ -47,11 +47,21 @@ export function Hero() {
       <a
         href="#antes"
         onClick={() => window.dispatchEvent(new Event(AUDIO_PLAY_EVENT))}
-        className="group absolute bottom-[8vh] flex flex-col items-center gap-3 text-mist transition-colors hover:text-star"
-        aria-label="Começar"
+        className="group absolute bottom-[8vh] flex animate-title-in items-center gap-2.5 rounded-full border border-ember/40 bg-night-soft/40 px-7 py-3 text-ember backdrop-blur-sm transition-all duration-300 hover:border-ember/70 hover:bg-ember/10 hover:text-star"
+        style={delay(2100)}
+        aria-label="Começar a nossa história"
       >
-        <span className="label text-[0.6rem]">desce aí, tem uma coisa antes</span>
-        <span className="h-12 w-px animate-hint-fade bg-gradient-to-b from-ember to-transparent" />
+        <span className="font-mono text-xs tracking-[0.18em]">Aperta aí</span>
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          className="animate-hint-fade transition-transform duration-300 group-hover:translate-y-0.5"
+          aria-hidden
+        >
+          <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </a>
     </header>
   )
