@@ -125,6 +125,21 @@
   background: theme('colors.night.deep');
 }
 
+/* entrada leve do lightbox (sem blur — filtro de blur trava no mobile) */
+@keyframes lb-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.lb-in {
+  animation: lb-in 0.22s ease-out both;
+}
+
 /* no mobile, encurta o passo de scroll por estrela pra não exigir rolagem infinita */
 @media (max-width: 640px) {
   #ceu {

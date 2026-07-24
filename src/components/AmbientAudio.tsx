@@ -1,21 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import { connectMusic, duckMusic, ensureBus, MUSIC_VOLUME } from '../audioBus'
 
 /** Playlist de fundo (dentro de /public), tocada em ordem e em loop no fim. */
 const TRACKS = ['/musica.mp3', '/musica2.mp3', '/musica3.mp3']
 /** Velocidade de reprodução (mantendo o tom). */
 const SPEED = 1.15
-/** Volume rebaixado (fallback sem Web Audio) enquanto um vídeo toca. */
-const DUCKED_VOLUME = 0.06
+/** Volume de fundo (0–1). */
+const VOLUME = 0.45
+/** Volume rebaixado enquanto um vídeo em destaque toca. */
+const DUCKED = 0.06
 /** Evento pra abaixar/restaurar a música (disparado ao abrir/fechar vídeo). */
 export const AUDIO_DUCK_EVENT = 'audio-duck'
 
 /**
  * Trilha de fundo em playlist. Tenta tocar assim que o site abre; se o navegador
- * bloquear o autoplay com som (quase sempre bloqueia), a música entra sozinha no
- * primeiro gesto do usuário. O áudio é roteado por um AudioContext único (ver
- * audioBus) pra que o som dos vídeos NÃO pause a música — só abaixe o volume dela.
- * Um botão discreto no canto permite pausar/retomar.
+ * bloquear o autoplay com som, entra no primeiro gesto do usuário. Ao abrir um
+ * vídeo em destaque, o volume abaixa (não pausa); volta ao fechar.
  */
 export function AmbientAudio() {
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -25,10 +24,7 @@ export function AmbientAudio() {
     const audio = audioRef.current
     if (!audio) return
     if (!audio.src) audio.src = TRACKS[0]
-
-    // liga ao barramento Web Audio; se rolar, o ganho fica com o bus (volume=1)
-    const usingBus = connectMusic(audio)
-    audio.volume = usingBus ? 1 : MUSIC_VOLUME
+    audio.volume = VOLUME
 
     // ao acabar uma faixa, passa pra próxima; depois da última, volta pra primeira
     let idx = 0
@@ -40,19 +36,13 @@ export function AmbientAudio() {
     audio.addEventListener('ended', onEnded)
 
     const start = () => {
-      // acorda o AudioContext DENTRO do gesto (senão o som vai pro contexto
-      // suspenso e a música toca "muda" no mobile)
-      ensureBus()
       audio
         .play()
         .then(() => setPlaying(true))
         .catch(() => setPlaying(false))
     }
-
-    // 1) tenta tocar de cara (funciona em alguns navegadores/PWA)
     start()
 
-    // 2) se o autoplay foi barrado, começa no primeiro gesto
     const onFirstGesture = () => {
       if (audio.paused) start()
       removeGestureListeners()
@@ -70,10 +60,9 @@ export function AmbientAudio() {
     audio.addEventListener('play', onPlay)
     audio.addEventListener('pause', onPause)
 
-    // duck: com Web Audio, abaixa o ganho (sem pausar). Sem Web Audio, fallback
-    // suave no volume do elemento.
+    // duck: abaixa/restaura o volume suavemente quando um vídeo abre/fecha
     let fadeRaf = 0
-    const fadeVolumeTo = (target: number) => {
+    const fadeTo = (target: number) => {
       cancelAnimationFrame(fadeRaf)
       const step = () => {
         const diff = target - audio.volume
@@ -88,8 +77,7 @@ export function AmbientAudio() {
     }
     const onDuck = (e: Event) => {
       const active = !!(e as CustomEvent<{ active: boolean }>).detail?.active
-      if (usingBus) duckMusic(active)
-      else fadeVolumeTo(active ? DUCKED_VOLUME : MUSIC_VOLUME)
+      fadeTo(active ? DUCKED : VOLUME)
     }
     window.addEventListener(AUDIO_DUCK_EVENT, onDuck)
 
@@ -106,18 +94,12 @@ export function AmbientAudio() {
   const toggle = () => {
     const audio = audioRef.current
     if (!audio) return
-    if (audio.paused) {
-      ensureBus() // acorda o contexto no clique
-      audio.play().catch(() => {})
-    } else {
-      audio.pause()
-    }
+    if (audio.paused) audio.play().catch(() => {})
+    else audio.pause()
   }
 
   return (
     <>
-      {/* preload="none": não baixa nada na abertura; o play() no primeiro gesto
-          dispara o download da faixa atual. Ordem/loop no efeito (evento 'ended'). */}
       <audio ref={audioRef} preload="none" />
       <button
         onClick={toggle}
@@ -126,7 +108,6 @@ export function AmbientAudio() {
         className="group fixed bottom-5 right-5 z-[60] flex h-10 w-10 items-center justify-center rounded-full border border-ember/25 bg-night-soft/70 text-mist backdrop-blur-sm transition-colors hover:border-ember/50 hover:text-star"
       >
         {playing ? (
-          // som ligado: ondinhas
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
             <path
@@ -139,7 +120,6 @@ export function AmbientAudio() {
             </path>
           </svg>
         ) : (
-          // som pausado/mudo: alto-falante cortado
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
             <path d="M17 9l4 6M21 9l-4 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />

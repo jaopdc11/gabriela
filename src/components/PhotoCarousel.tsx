@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AUDIO_DUCK_EVENT } from './AmbientAudio'
-import { connectVideo } from '../audioBus'
 
 /** Distância mínima (px) de um arrastar pra contar como troca de mídia. */
 const SWIPE_THRESHOLD = 45
@@ -156,14 +155,8 @@ function MediaCard({ item, k, onOpen }: { item: Media; k: number; onOpen: () => 
 function LightboxVideo({ src }: { src: string }) {
   const ref = useRef<HTMLVideoElement>(null)
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    // roteia o áudio do vídeo pelo mesmo AudioContext da música → o vídeo não
-    // rouba o foco e a música só abaixa (não pausa). a abertura veio de um clique,
-    // então o play com som é permitido.
-    const disconnect = connectVideo(el)
-    el.play().catch(() => {})
-    return () => disconnect?.()
+    // a abertura veio de um clique → o play com som é permitido
+    ref.current?.play().catch(() => {})
   }, [src])
   return (
     <video
@@ -293,7 +286,7 @@ export function PhotoCarousel() {
           <div
             key={sel}
             onClick={(e) => e.stopPropagation()}
-            className="relative animate-title-in rounded-[4px] bg-[#f4efe3] p-3 pb-11 shadow-[0_40px_130px_-30px_rgba(0,0,0,0.95)] sm:p-4 sm:pb-14"
+            className="lb-in relative rounded-[4px] bg-[#f4efe3] p-3 pb-11 shadow-[0_40px_130px_-30px_rgba(0,0,0,0.95)] sm:p-4 sm:pb-14"
           >
             {/* textura de papel + calço interno */}
             <span
@@ -307,6 +300,7 @@ export function PhotoCarousel() {
                 <img
                   src={current.src}
                   alt={`Nós dois, foto ${sel + 1}`}
+                  decoding="async"
                   className="block max-h-[76vh] max-w-[86vw] object-contain"
                   draggable={false}
                 />
