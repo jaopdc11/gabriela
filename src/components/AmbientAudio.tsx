@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { connectMusic, duckMusic, MUSIC_VOLUME } from '../audioBus'
+import { connectMusic, duckMusic, ensureBus, MUSIC_VOLUME } from '../audioBus'
 
 /** Playlist de fundo (dentro de /public), tocada em ordem e em loop no fim. */
 const TRACKS = ['/musica.mp3', '/musica2.mp3', '/musica3.mp3']
+/** Velocidade de reprodução (mantendo o tom). */
+const SPEED = 1.15
 /** Volume rebaixado (fallback sem Web Audio) enquanto um vídeo toca. */
 const DUCKED_VOLUME = 0.06
 /** Evento pra abaixar/restaurar a música (disparado ao abrir/fechar vídeo). */
@@ -38,6 +40,9 @@ export function AmbientAudio() {
     audio.addEventListener('ended', onEnded)
 
     const start = () => {
+      // acorda o AudioContext DENTRO do gesto (senão o som vai pro contexto
+      // suspenso e a música toca "muda" no mobile)
+      ensureBus()
       audio
         .play()
         .then(() => setPlaying(true))
@@ -57,7 +62,10 @@ export function AmbientAudio() {
       events.forEach((ev) => window.removeEventListener(ev, onFirstGesture))
     events.forEach((ev) => window.addEventListener(ev, onFirstGesture, { once: false, passive: true }))
 
-    const onPlay = () => setPlaying(true)
+    const onPlay = () => {
+      audio.playbackRate = SPEED // reafirma a cada faixa (o src novo reseta)
+      setPlaying(true)
+    }
     const onPause = () => setPlaying(false)
     audio.addEventListener('play', onPlay)
     audio.addEventListener('pause', onPause)
@@ -98,8 +106,12 @@ export function AmbientAudio() {
   const toggle = () => {
     const audio = audioRef.current
     if (!audio) return
-    if (audio.paused) audio.play().catch(() => {})
-    else audio.pause()
+    if (audio.paused) {
+      ensureBus() // acorda o contexto no clique
+      audio.play().catch(() => {})
+    } else {
+      audio.pause()
+    }
   }
 
   return (

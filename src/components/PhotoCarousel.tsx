@@ -61,7 +61,7 @@ const isNarrow = () =>
 function PlayBadge() {
   return (
     <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-night-deep/45 backdrop-blur-[2px] transition-transform duration-300 ease-out group-hover:scale-110">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-night-deep/55 transition-transform duration-300 ease-out group-hover:scale-110">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="ml-0.5 text-star/90" aria-hidden>
           <path d="M8 5v14l11-7z" />
         </svg>
@@ -119,7 +119,7 @@ function MediaCard({ item, k, onOpen }: { item: Media; k: number; onOpen: () => 
           {/* fita adesiva no topo */}
           <span
             aria-hidden
-            className="absolute -top-2 left-1/2 h-5 w-14 -translate-x-1/2 rounded-[1px] bg-star/15 shadow-sm ring-1 ring-white/10 backdrop-blur-[1px]"
+            className="absolute -top-2 left-1/2 h-5 w-14 -translate-x-1/2 rounded-[1px] bg-star/15 shadow-sm ring-1 ring-white/10"
             style={{ transform: `translateX(-50%) rotate(${tapeOf(k)}deg)` }}
           />
           <span className="relative block overflow-hidden rounded-[2px]">
