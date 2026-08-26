@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
-/** Playlist de fundo (dentro de /public), tocada em ordem e em loop no fim. */
+/** Playlist padrão (dentro de /public), tocada em ordem e em loop no fim. */
 const TRACKS = ['/musica.mp3', '/musica2.mp3', '/musica3.mp3']
+/** Se nenhuma faixa do mundo carregar (arquivo ainda não colocado), cai nessa. */
+const FALLBACK = '/musica.mp3'
 /** Velocidade de reprodução (mantendo o tom). */
 const SPEED = 1.15
 /** Volume de fundo (0–1). */
@@ -14,28 +16,47 @@ export const AUDIO_DUCK_EVENT = 'audio-duck'
 export const AUDIO_PLAY_EVENT = 'ambient-play'
 
 /**
- * Trilha de fundo em playlist. Tenta tocar assim que o site abre; se o navegador
- * bloquear o autoplay com som, entra no primeiro gesto do usuário. Ao abrir um
- * vídeo em destaque, o volume abaixa (não pausa); volta ao fechar.
+ * Trilha de fundo em playlist, própria de cada mundo. Tenta tocar assim que o
+ * site abre; se o navegador bloquear o autoplay com som, entra no primeiro gesto
+ * do usuário. Ao abrir um vídeo em destaque, o volume abaixa (não pausa); volta
+ * ao fechar. Ao trocar de mundo, a playlist troca e recomeça na primeira faixa.
  */
-export function AmbientAudio() {
+export function AmbientAudio({ tracks = TRACKS }: { tracks?: string[] }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    if (!audio.src) audio.src = TRACKS[0]
+    const list = tracks.length ? tracks : TRACKS
+    // troca de mundo: se a faixa atual não é dessa playlist, começa da primeira
+    if (!list.some((t) => audio.src.endsWith(t))) audio.src = list[0]
     audio.volume = VOLUME
 
     // ao acabar uma faixa, passa pra próxima; depois da última, volta pra primeira
     let idx = 0
     const onEnded = () => {
-      idx = (idx + 1) % TRACKS.length
-      audio.src = TRACKS[idx]
+      idx = (idx + 1) % list.length
+      audio.src = list[idx]
       audio.play().catch(() => {})
     }
     audio.addEventListener('ended', onEnded)
+
+    // faixa que não carrega (arquivo ainda não colocado em public/) não pode
+    // deixar o site mudo: pula pra próxima e, se todas falharem, usa a padrão
+    let failures = 0
+    const onError = () => {
+      failures++
+      if (failures > list.length) {
+        if (!audio.src.endsWith(FALLBACK)) {
+          audio.src = FALLBACK
+          audio.play().catch(() => {})
+        }
+        return
+      }
+      onEnded()
+    }
+    audio.addEventListener('error', onError)
 
     const start = () => {
       audio
@@ -105,12 +126,13 @@ export function AmbientAudio() {
       removeGestureListeners()
       cancelAnimationFrame(fadeRaf)
       audio.removeEventListener('ended', onEnded)
+      audio.removeEventListener('error', onError)
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('pause', onPause)
       window.removeEventListener(AUDIO_DUCK_EVENT, onDuck)
       window.removeEventListener(AUDIO_PLAY_EVENT, onPlayRequest)
     }
-  }, [])
+  }, [tracks])
 
   const toggle = () => {
     const audio = audioRef.current

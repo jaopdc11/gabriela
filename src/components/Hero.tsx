@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react'
-import { START_DATE, NAMORO_DATE } from '../data'
+import { START_DATE, NAMORO_DATE, type World } from '../data'
 import { useElapsed } from '../useElapsed'
 import { CounterTimecode } from './CounterTimecode'
 import { AUDIO_PLAY_EVENT } from './AmbientAudio'
@@ -7,16 +7,16 @@ import { AUDIO_PLAY_EVENT } from './AmbientAudio'
 const delay = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` })
 
 /** Abertura: título de cinema sobre o céu. */
-export function Hero() {
+export function Hero({ world }: { world: World }) {
   const elapsedConhecemos = useElapsed(START_DATE)
   const elapsedNamoro = useElapsed(NAMORO_DATE)
-  const [mode, setMode] = useState<'conhecemos' | 'namoro'>('conhecemos')
+  const [mode, setMode] = useState<'conhecemos' | 'namoro'>(world.heroCounter)
   const elapsed = mode === 'conhecemos' ? elapsedConhecemos : elapsedNamoro
 
   return (
     <header className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 text-center">
       <p className="label animate-title-in" style={delay(200)}>
-        a nossa história, pra ti
+        {world.heroKicker}
       </p>
 
       <h1
@@ -38,7 +38,7 @@ export function Hero() {
       </h1>
 
       <p className="label mt-10 animate-title-in text-ember/80" style={delay(1500)}>
-        06 · 06 · 2026
+        {world.heroDate}
       </p>
 
       <div className="mt-14 animate-title-in" style={delay(1900)}>

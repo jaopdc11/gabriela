@@ -1,65 +1,49 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+// as peças da carta (revelar ao rolar, parágrafo, frase em âmbar) moram no
+// Letter.tsx, que é também o que desenha a dedicatória de cada mês
+import { Beat, Line, Reveal } from './Letter'
 
-const reducedMotion = () =>
-  typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
-
-/** Revela o filho quando ele entra na viewport: fade + leve subida saindo do desfoque. */
-function Reveal({ children, className = '' }: { children: ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [shown, setShown] = useState(() => reducedMotion())
-
-  useEffect(() => {
-    if (reducedMotion()) return
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setShown(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.35, rootMargin: '0px 0px -12% 0px' },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
+/**
+ * Prólogo do mundo do namoro: a ponte entre o céu antigo e o novo.
+ * (rascunho curto — é aqui que o João reescreve com as palavras dele)
+ */
+export function PrologueNamoro() {
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-[1100ms] ease-out ${
-        shown ? 'translate-y-0 opacity-100 blur-0' : 'translate-y-6 opacity-0 blur-[3px]'
-      } ${className}`}
+    <section
+      id="antes"
+      className="relative mx-auto flex max-w-3xl flex-col items-center gap-16 px-6 py-40 text-center sm:gap-24"
     >
-      {children}
-    </div>
-  )
-}
+      <Reveal>
+        <p className="label text-mist">capítulo dois</p>
+        <p className="mt-8 font-display text-4xl font-light italic text-star sm:text-5xl">
+          e depois do sim,
+        </p>
+      </Reveal>
 
-/** Uma frase-chave, grande e em âmbar, que quebra o ritmo da carta. */
-function Beat({ children, big = false }: { children: ReactNode; big?: boolean }) {
-  return (
-    <Reveal>
-      <p
-        className={`mx-auto max-w-2xl font-display font-light italic leading-tight text-ember ${
-          big ? 'text-3xl sm:text-5xl' : 'text-2xl sm:text-4xl'
-        }`}
-      >
-        {children}
-      </p>
-    </Reveal>
-  )
-}
+      <Line>
+        aquele primeiro céu terminava no dia em que tu disse sim. e eu passei uns dias achando que tava bom, 
+        quando na verdade a nossa história tinha acabado de começar.
+      </Line>
 
-/** Um parágrafo normal da carta. */
-function Line({ children }: { children: ReactNode }) {
-  return (
-    <Reveal>
-      <p className="mx-auto max-w-xl text-[0.98rem] leading-relaxed text-star/80 sm:text-lg">
-        {children}
-      </p>
-    </Reveal>
+      <Beat>esse céu aqui não tem última estrela.</Beat>
+
+      <Line>
+        cada coisa nossa daqui pra frente vira uma estrela aqui em cima: os dias bobos, as viagens,
+        as brigas que a gente atravessar, as manhãs. eu vou acendendo, e tu vem ver nossa constelação se formar.
+      </Line>
+
+      <Beat big>é pra durar, e eu tô só começando.</Beat>
+
+      <Reveal>
+        <a
+          href="#ceu"
+          className="group flex flex-col items-center gap-3 text-mist transition-colors hover:text-star"
+          aria-label="Ir para o céu do namoro"
+        >
+          <span className="label text-[0.6rem]">o nosso namoro, nas estrelas</span>
+          <span className="h-12 w-px animate-hint-fade bg-gradient-to-b from-ember to-transparent" />
+        </a>
+      </Reveal>
+    </section>
   )
 }
 

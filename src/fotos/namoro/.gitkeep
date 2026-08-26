@@ -1,0 +1,8 @@
+# Fotos e vídeos do NAMORO (depois do sim).
+#
+# O álbum do namoro é um só, mas dá pra filtrar por mês. Pra isso, cada mês tem
+# a sua pasta: mes-01 (23/07 a 22/08), mes-02 (23/08 a 22/09), e assim por diante.
+# Só jogar os arquivos na pasta do mês — o filtro "mês 1 · mês 2 ..." aparece
+# sozinho, e o álbum abre já no mês do capítulo que está sendo lido.
+#
+# Arquivo solto aqui fora, sem pasta de mês, aparece só em "todas".

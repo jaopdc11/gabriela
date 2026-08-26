@@ -1,21 +1,26 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AUDIO_DUCK_EVENT } from './AmbientAudio'
 
 /** Distância mínima (px) de um arrastar pra contar como troca de mídia. */
 const SWIPE_THRESHOLD = 45
 
-type Media = { src: string; type: 'photo' | 'video'; poster: number }
+type Media = { src: string; type: 'photo' | 'video'; poster: number; month: number | null }
 
 /**
- * Carrega automaticamente fotos E vídeos de src/fotos (ordem alfabética do nome).
+ * Carrega automaticamente fotos E vídeos de src/fotos e das suas subpastas
+ * (ordem alfabética do nome). Cada subpasta é um álbum de um mundo: a raiz é o
+ * álbum do começo, `namoro/` é o álbum do namoro.
+ * Dentro do álbum do namoro, uma subpasta `mes-01`, `mes-02`... marca de que mês
+ * de namoro é a foto — é isso que alimenta o filtro por mês. Foto solta na pasta
+ * aparece em "todas", sem mês.
  * Pra escolher o frame de capa de um vídeo, ponha o tempo (em segundos) no fim do
  * nome com "@": ex. "praia@3.5.mp4" mostra o frame de 3,5s. Sem "@", usa ~0,1s.
  */
-const photoModules = import.meta.glob('../fotos/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
-  eager: true,
-  import: 'default',
-})
-const videoModules = import.meta.glob('../fotos/*.{mp4,webm,mov,m4v,MP4,WEBM,MOV,M4V}', {
+const photoModules = import.meta.glob(
+  '../fotos/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}',
+  { eager: true, import: 'default' },
+)
+const videoModules = import.meta.glob('../fotos/**/*.{mp4,webm,mov,m4v,MP4,WEBM,MOV,M4V}', {
   eager: true,
   import: 'default',
 })
@@ -26,7 +31,20 @@ const posterOf = (key: string) => {
   return m ? parseFloat(m[1]) : 0.1
 }
 
-const MEDIA: Media[] = [
+/** Subpasta do arquivo dentro de src/fotos ('' quando está na raiz). */
+const dirOf = (key: string) => {
+  const rest = key.replace('../fotos/', '')
+  const cut = rest.lastIndexOf('/')
+  return cut === -1 ? '' : rest.slice(0, cut)
+}
+
+/** Mês de namoro da mídia, lido de uma subpasta "mes-NN" no caminho. */
+const monthOf = (key: string) => {
+  const m = key.match(/\/mes-0*(\d+)\//)
+  return m ? parseInt(m[1], 10) : null
+}
+
+const ALL_MEDIA: (Media & { dir: string; key: string })[] = [
   ...Object.entries(photoModules).map(([key, v]) => ({
     key,
     src: v as string,
@@ -41,7 +59,16 @@ const MEDIA: Media[] = [
   })),
 ]
   .sort((a, b) => a.key.localeCompare(b.key))
-  .map(({ src, type, poster }) => ({ src, type, poster }))
+  .map((m) => ({ ...m, dir: dirOf(m.key), month: monthOf(m.key) }))
+
+/**
+ * As mídias de um álbum. `deep` inclui as subpastas de mês — a raiz nunca é
+ * varrida fundo, senão o álbum do começo engoliria o álbum do namoro.
+ */
+const mediaIn = (dir: string, deep = false): Media[] =>
+  ALL_MEDIA.filter(
+    (m) => m.dir === dir || (deep && dir !== '' && m.dir.startsWith(`${dir}/`)),
+  ).map(({ src, type, poster, month }) => ({ src, type, poster, month }))
 
 /** Inclinação/flutuação determinística por índice (mesmo mural todo carregamento). */
 const tiltOf = (k: number) => ((k * 53) % 9) - 4 // -4..4 graus
@@ -172,7 +199,49 @@ function LightboxVideo({ src }: { src: string }) {
 }
 
 /** Mural flutuante das nossas fotos e vídeos, com abertura em tela cheia ao clicar. */
-export function PhotoCarousel() {
+export function PhotoCarousel({
+  dir = '',
+  label = 'o nosso álbum',
+  title = 'a gente, em fotos',
+  months,
+  activeMonth,
+}: {
+  /** subpasta de src/fotos ('' = raiz) */
+  dir?: string
+  label?: string
+  title?: string
+  /** meses disponíveis pro filtro (sem isso, o álbum não tem filtro) */
+  months?: { n: number; nav: string }[]
+  /** mês em que o álbum abre — o do capítulo que está sendo lido */
+  activeMonth?: number
+}) {
+  // com filtro por mês, o álbum é um só: varre as subpastas de mês junto
+  const ALBUM = useMemo(() => mediaIn(dir, !!months), [dir, months])
+
+  /** meses que realmente têm mídia — não mostra filtro vazio */
+  const tabs = useMemo(() => {
+    if (!months) return []
+    const has = new Set(ALBUM.map((m) => m.month).filter((m): m is number => m !== null))
+    return months.filter((m) => has.has(m.n))
+  }, [months, ALBUM])
+
+  const [filter, setFilter] = useState<number | 'todas'>(() =>
+    activeMonth && ALBUM.some((m) => m.month === activeMonth) ? activeMonth : 'todas',
+  )
+
+  /** as pílulas do filtro: "todas" na frente, depois os meses com foto */
+  const chips = useMemo(
+    () => [
+      { key: 'todas' as const, nav: 'todas' },
+      ...tabs.map((t) => ({ key: t.n as number, nav: t.nav })),
+    ],
+    [tabs],
+  )
+
+  const MEDIA = useMemo(
+    () => (filter === 'todas' ? ALBUM : ALBUM.filter((m) => m.month === filter)),
+    [ALBUM, filter],
+  )
   const n = MEDIA.length
   const [sel, setSel] = useState<number | null>(null)
   const open = sel !== null
@@ -239,21 +308,49 @@ export function PhotoCarousel() {
     return () => {
       window.dispatchEvent(new CustomEvent(AUDIO_DUCK_EVENT, { detail: { active: false } }))
     }
-  }, [open, sel])
+  }, [open, sel, MEDIA])
 
   const current = sel !== null ? MEDIA[sel] : null
 
   return (
-    <section id="album" className="relative mx-auto max-w-6xl px-6 py-28 text-center sm:py-36">
-      <p className="label text-mist">o nosso álbum</p>
+    <section
+      id={dir ? `album-${dir}` : 'album'}
+      className="relative mx-auto max-w-6xl px-6 py-28 text-center sm:py-36"
+    >
+      <p className="label text-mist">{label}</p>
       <h2 className="mt-4 font-display text-3xl font-light italic text-star sm:text-5xl">
-        a gente, em fotos
+        {title}
       </h2>
+
+      {/* filtro por mês: o álbum é um só, mas dá pra ver mês a mês */}
+      {tabs.length > 0 && (
+        <div className="mt-8 flex justify-center">
+          <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/10 bg-night-deep/60 p-1 backdrop-blur-md">
+            {chips.map((c) => (
+              <button
+                key={c.key}
+                onClick={() => {
+                  setSel(null)
+                  setFilter(c.key)
+                }}
+                aria-current={filter === c.key ? 'true' : undefined}
+                className={`label shrink-0 rounded-full px-3 py-1.5 transition-colors ${
+                  filter === c.key
+                    ? 'bg-ember/15 text-ember ring-1 ring-ember/40'
+                    : 'text-mist hover:text-star'
+                }`}
+              >
+                {c.nav}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {n === 0 ? (
         <p className="mt-12 text-sm leading-relaxed text-mist">
           (as fotos e vídeos aparecem aqui automaticamente assim que forem colocados na pasta{' '}
-          <span className="font-mono text-star/70">src/fotos/</span>)
+          <span className="font-mono text-star/70">src/fotos/{dir && `${dir}/`}</span>)
         </p>
       ) : (
         <div className="mt-14 gap-5 [column-fill:_balance] columns-2 sm:columns-3 lg:columns-4">
