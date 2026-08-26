@@ -36,6 +36,8 @@ export type Chapter = {
   dedication?: Dedication
   /** O mês que está sendo vivido agora. */
   current: boolean
+  /** O mês já virou: o aniversário de mês passou, o capítulo está completo. */
+  closed: boolean
 }
 
 const NAMES = [
@@ -184,6 +186,7 @@ export function buildChapters(world: World, start: Date, now: Date, dev: boolean
       finale,
       dedication,
       current: n === chapterOf(start, now),
+      closed,
     }
   })
 }

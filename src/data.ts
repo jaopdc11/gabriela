@@ -308,13 +308,6 @@ E aí eu fiz uma coisa que eu jamais imaginei que sairia de mim: dediquei Pixote
 Mas o que de verdade mexeu comigo daquela noite não foi nada disso. A gente tava tirando fotos, e numa delas eu te peguei distraída, só olhando pra mim. E ali dá pra ver o brilho no teu olho quando tu me olha. Puta merda, vida. Aquele jeitinho, aquele brilho, é a prova que eu não sei arranjar em lugar nenhum de que eu sou amado. Ninguém consegue fingir isso numa foto que nem sabia que tava sendo tirada
 Eu guardo essa foto como quem guarda um documento. Nos dias em que a minha cabeça me disser que eu não mereço, que eu sou demais pra alguém aguentar, eu vou olhar pro teu olho naquela foto e calar a boca dela. Foi só um sábado num pagode, e eu levei dele a coisa mais importante do mundo`,
   },
-  // ⚠️ ESTRELA DE TESTE — só pra ver o segundo mês acender no mapa.
-  // É só apagar esse bloco (ou trocar o texto) quando não precisar mais.
-  {
-    date: new Date(2026, 7, 24),
-    title: 'A primeira estrela do segundo mês',
-    description: `(estrela de teste, pra ver o céu do mês novo abrindo)`,
-  },
 ]
 
 /**

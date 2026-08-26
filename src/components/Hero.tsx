@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { useState, type CSSProperties, type MouseEvent } from 'react'
 import { START_DATE, NAMORO_DATE, type World } from '../data'
 import { useElapsed } from '../useElapsed'
 import { CounterTimecode } from './CounterTimecode'
@@ -7,11 +7,24 @@ import { AUDIO_PLAY_EVENT } from './AmbientAudio'
 const delay = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` })
 
 /** Abertura: título de cinema sobre o céu. */
-export function Hero({ world }: { world: World }) {
+export function Hero({ world, to = '#antes' }: { world: World; to?: string }) {
   const elapsedConhecemos = useElapsed(START_DATE)
   const elapsedNamoro = useElapsed(NAMORO_DATE)
   const [mode, setMode] = useState<'conhecemos' | 'namoro'>(world.heroCounter)
   const elapsed = mode === 'conhecemos' ? elapsedConhecemos : elapsedNamoro
+
+  /**
+   * A descida da capa é feita na mão, sem deixar a âncora no endereço: o
+   * navegador ignora um clique numa âncora que já está na URL, e era isso que
+   * fazia o botão parar de descer depois da primeira vez.
+   */
+  const goDown = (e: MouseEvent<HTMLAnchorElement>) => {
+    window.dispatchEvent(new Event(AUDIO_PLAY_EVENT))
+    const target = document.querySelector(to)
+    if (!target) return // sem o alvo na tela, o navegador que decida
+    e.preventDefault()
+    target.scrollIntoView() // a suavidade vem do scroll-behavior do CSS
+  }
 
   return (
     <header className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 text-center">
@@ -65,8 +78,8 @@ export function Hero({ world }: { world: World }) {
       </p>
 
       <a
-        href="#antes"
-        onClick={() => window.dispatchEvent(new Event(AUDIO_PLAY_EVENT))}
+        href={to}
+        onClick={goDown}
         className="group absolute bottom-[8vh] flex animate-title-in items-center gap-2.5 rounded-full border border-ember/40 bg-night-soft/40 px-7 py-3 text-ember backdrop-blur-sm transition-all duration-300 hover:border-ember/70 hover:bg-ember/10 hover:text-star"
         style={delay(2100)}
         aria-label="Começar a nossa história"

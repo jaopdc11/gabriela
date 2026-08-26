@@ -28,10 +28,16 @@ const chapterFromUrl = (): number | null => {
   return Number.isFinite(n) ? n : null
 }
 
-/** O capítulo que abre o mundo: o mês mais recente que já tem o que mostrar. */
-const latestWritten = (chapters: Chapter[]) => {
-  const written = chapters.filter((c) => c.stars.length > 0 || c.finale)
-  return written.length > 0 ? written[written.length - 1].n : chapters[0].n
+/**
+ * O capítulo que abre o mundo: o último mês que já FECHOU. O mês corrente está
+ * acontecendo agora — abrir nele é abrir um capítulo pela metade, sem carta nem
+ * fecho. Entre os meses fechados, o último que tem alguma coisa escrita; se
+ * nenhum mês fechou ainda, o primeiro.
+ */
+const openingChapter = (chapters: Chapter[]) => {
+  const closed = chapters.filter((c) => c.closed)
+  const written = closed.filter((c) => c.stars.length > 0 || c.finale || c.dedication)
+  return (written[written.length - 1] ?? closed[closed.length - 1] ?? chapters[0]).n
 }
 
 /** O mapa de todas as estrelas mora em ?mapa=1. */
@@ -57,7 +63,7 @@ export default function App() {
   const [chapterN, setChapterN] = useState<number | null>(chapterFromUrl)
   const chapter =
     chapters.find((c) => c.n === chapterN) ??
-    (chapters.length > 0 ? chapters.find((c) => c.n === latestWritten(chapters))! : undefined)
+    (chapters.length > 0 ? chapters.find((c) => c.n === openingChapter(chapters))! : undefined)
   const nextChapter = chapter ? chapters.find((c) => c.n === chapter.n + 1) : undefined
   // estável: é prop do álbum, e o álbum reage a mudança de identidade
   const monthTabs = useMemo(() => chapters.map((c) => ({ n: c.n, nav: c.nav })), [chapters])
@@ -153,7 +159,9 @@ export default function App() {
       ) : (
       /* a key remonta tudo na troca: as animações de entrada rodam de novo */
       <main key={worldId} className="relative z-10">
-        <Hero world={world} />
+        {/* o prólogo (#antes) só existe no capítulo 1; nos outros meses o botão
+            da capa desce direto pra cartela do capítulo */}
+        <Hero world={world} to={world.chaptered && chapter && chapter.n !== 1 ? '#capitulo' : '#antes'} />
         {world.chaptered && chapter ? (
           <>
             {/* a ponte do sim pro namoro abre o primeiro capítulo */}
