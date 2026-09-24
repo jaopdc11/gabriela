@@ -28,12 +28,30 @@ type Meteor = {
   max: number
 }
 
+/**
+ * Nuvens de nebulosa (cor difusa que dá profundidade ao céu). Moram numa camada
+ * de CSS atrás do canvas, e não nele: pintar três gradientes maiores que a tela
+ * a cada quadro era, sozinho, metade do custo do céu, por um movimento que
+ * levava minutos pra se notar. Assim o navegador pinta uma vez e só desliza a
+ * camada com a rolagem.
+ */
+const NEBULAE = [
+  { x: 0.22, y: 0.26, r: 0.55, col: '92, 108, 196', amp: 0.05 },
+  { x: 0.8, y: 0.44, r: 0.62, col: '150, 78, 140', amp: 0.055 },
+  { x: 0.5, y: 0.84, r: 0.5, col: '176, 116, 62', amp: 0.05 },
+]
+const NEBULA_BG = NEBULAE.map(
+  (n) =>
+    `radial-gradient(circle ${n.r * 100}vmax at ${n.x * 100}% calc(${n.y} * 100lvh), rgba(${n.col}, ${n.amp}), rgba(${n.col}, 0))`,
+).join(', ')
+
 const prefersReduced = () =>
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** Céu de estrelas em canvas: cintilância, parallax e meteoros ocasionais. */
 export function Starfield() {
   const ref = useRef<HTMLCanvasElement>(null)
+  const nebulaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const canvas = ref.current
@@ -50,13 +68,6 @@ export function Starfield() {
     const meteors: Meteor[] = []
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 }
     let scrollY = window.scrollY
-
-    // nuvens de nebulosa (cor difusa que dá profundidade ao céu)
-    const nebulae = [
-      { x: 0.22, y: 0.26, r: 0.55, col: [92, 108, 196], amp: 0.05, drift: 0.03 },
-      { x: 0.8, y: 0.44, r: 0.62, col: [150, 78, 140], amp: 0.055, drift: 0.024 },
-      { x: 0.5, y: 0.84, r: 0.5, col: [176, 116, 62], amp: 0.05, drift: 0.02 },
-    ]
 
     const rand = (a: number, b: number) => a + Math.random() * (b - a)
 
@@ -78,8 +89,83 @@ export function Starfield() {
       sprites.set(rgb, c)
     }
 
+    /**
+     * Tudo que era gradiente recriado a cada quadro (nebulosa em tela cheia,
+     * bokeh, cruz das estrelas, lua) vira desenho pronto, feito uma vez só: o
+     * quadro passa a ser só carimbar imagem. Criar gradiente e pintar ele pixel
+     * a pixel, 60 vezes por segundo, era o que travava o céu no celular.
+     */
+    const radial = (size: number, stops: [number, string][]) => {
+      const c = document.createElement('canvas')
+      c.width = c.height = size
+      const g = c.getContext('2d')!
+      const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+      for (const [at, col] of stops) grad.addColorStop(at, col)
+      g.fillStyle = grad
+      g.fillRect(0, 0, size, size)
+      return c
+    }
+
+    const moteSprite = radial(64, [
+      [0, 'rgba(230, 205, 150, 1)'],
+      [1, 'rgba(230, 205, 150, 0)'],
+    ])
+
+    // a espícula: um traço que desbota nas duas pontas, esticado no tamanho da cruz
+    const spikes = new Map<string, HTMLCanvasElement>()
+    for (const rgb of STAR_COLORS) {
+      const c = document.createElement('canvas')
+      c.width = 64
+      c.height = 1
+      const g = c.getContext('2d')!
+      const grad = g.createLinearGradient(0, 0, 64, 0)
+      grad.addColorStop(0, `rgba(${rgb}, 0)`)
+      grad.addColorStop(0.5, `rgba(${rgb}, 1)`)
+      grad.addColorStop(1, `rgba(${rgb}, 0)`)
+      g.fillStyle = grad
+      g.fillRect(0, 0, 64, 1)
+      spikes.set(rgb, c)
+    }
+
+    // a lua (halo + disco), refeita só quando a tela muda de tamanho
+    let moon: HTMLCanvasElement | null = null
+    let mr = 30
+    function buildMoon() {
+      mr = Math.max(30, Math.min(w, h) * 0.055)
+      const half = Math.ceil(mr * 5)
+      const c = document.createElement('canvas')
+      c.width = c.height = Math.ceil(half * 2 * dpr)
+      const g = c.getContext('2d')!
+      g.scale(dpr, dpr)
+      const halo = g.createRadialGradient(half, half, mr * 0.5, half, half, mr * 5)
+      halo.addColorStop(0, 'rgba(240, 234, 216, 0.16)')
+      halo.addColorStop(1, 'rgba(240, 234, 216, 0)')
+      g.fillStyle = halo
+      g.beginPath()
+      g.arc(half, half, mr * 5, 0, Math.PI * 2)
+      g.fill()
+      const disc = g.createRadialGradient(half - mr * 0.3, half - mr * 0.3, mr * 0.2, half, half, mr)
+      disc.addColorStop(0, 'rgba(252, 249, 240, 0.95)')
+      disc.addColorStop(1, 'rgba(220, 216, 202, 0.7)')
+      g.fillStyle = disc
+      g.beginPath()
+      g.arc(half, half, mr, 0, Math.PI * 2)
+      g.fill()
+      moon = c
+    }
+
+    /** Uma espícula centrada em (x, y), girada `ang`, com `len` pra cada lado. */
+    function spike(img: HTMLCanvasElement, x: number, y: number, len: number, ang: number) {
+      const cos = Math.cos(ang)
+      const sin = Math.sin(ang)
+      ctx!.setTransform(dpr * cos, dpr * sin, -dpr * sin, dpr * cos, dpr * x, dpr * y)
+      ctx!.drawImage(img, -len, -0.3, len * 2, 0.6)
+    }
+
     function build() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      // o céu é todo luz difusa: acima de 1.5 o celular pinta o dobro de pixel
+      // sem diferença que dê pra ver
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5)
       w = window.innerWidth
       h = window.innerHeight
       canvas!.width = Math.floor(w * dpr)
@@ -116,6 +202,8 @@ export function Starfield() {
         a: 0.03 + Math.random() * 0.05,
         vy: 4 + Math.random() * 9,
       }))
+
+      buildMoon()
     }
 
     let meteorTimer = rand(0.8, 2.2)
@@ -139,21 +227,6 @@ export function Starfield() {
     function draw(dt: number, t: number) {
       ctx!.clearRect(0, 0, w, h)
 
-      // nebulosa (aditiva, bem sutil)
-      ctx!.globalCompositeOperation = 'lighter'
-      for (const n of nebulae) {
-        const cx = n.x * w + Math.sin(t * n.drift) * w * 0.05
-        const cy = n.y * h + Math.cos(t * n.drift * 0.8) * h * 0.05 - scrollY * 0.02
-        const rad = n.r * Math.max(w, h)
-        const g = ctx!.createRadialGradient(cx, cy, 0, cx, cy, rad)
-        const [r, gr, b] = n.col
-        g.addColorStop(0, `rgba(${r}, ${gr}, ${b}, ${n.amp})`)
-        g.addColorStop(1, `rgba(${r}, ${gr}, ${b}, 0)`)
-        ctx!.fillStyle = g
-        ctx!.fillRect(0, 0, w, h)
-      }
-      ctx!.globalCompositeOperation = 'source-over'
-
       // partículas de luz (bokeh) subindo devagar
       for (const mo of motes) {
         if (!reduced) {
@@ -163,13 +236,9 @@ export function Starfield() {
             mo.x = Math.random() * w
           }
         }
-        const mg = ctx!.createRadialGradient(mo.x, mo.y, 0, mo.x, mo.y, mo.r)
-        mg.addColorStop(0, `rgba(230, 205, 150, ${mo.a})`)
-        mg.addColorStop(1, 'rgba(230, 205, 150, 0)')
-        ctx!.fillStyle = mg
-        ctx!.beginPath()
-        ctx!.arc(mo.x, mo.y, mo.r, 0, Math.PI * 2)
-        ctx!.fill()
+        ctx!.globalAlpha = mo.a
+        ctx!.drawImage(moteSprite, mo.x - mo.r, mo.y - mo.r, mo.r * 2, mo.r * 2)
+        ctx!.globalAlpha = 1
       }
 
       const px = (mouse.x - w / 2) * 0.012
@@ -203,48 +272,20 @@ export function Starfield() {
         if (s.r > 1.15 && alpha > 0.4) {
           const len = s.r * (5 + alpha * 5)
           const a = alpha * 0.5
-          ctx!.lineWidth = 0.6
-          const gh = ctx!.createLinearGradient(x - len, y, x + len, y)
-          gh.addColorStop(0, `rgba(${rgb}, 0)`)
-          gh.addColorStop(0.5, `rgba(${rgb}, ${a})`)
-          gh.addColorStop(1, `rgba(${rgb}, 0)`)
-          ctx!.strokeStyle = gh
-          ctx!.beginPath()
-          ctx!.moveTo(x - len, y)
-          ctx!.lineTo(x + len, y)
-          ctx!.stroke()
-          const gv = ctx!.createLinearGradient(x, y - len, x, y + len)
-          gv.addColorStop(0, `rgba(${rgb}, 0)`)
-          gv.addColorStop(0.5, `rgba(${rgb}, ${a})`)
-          gv.addColorStop(1, `rgba(${rgb}, 0)`)
-          ctx!.strokeStyle = gv
-          ctx!.beginPath()
-          ctx!.moveTo(x, y - len)
-          ctx!.lineTo(x, y + len)
-          ctx!.stroke()
+          const img = spikes.get(rgb)!
+          ctx!.globalAlpha = a
+          spike(img, x, y, len, 0)
+          spike(img, x, y, len, Math.PI / 2)
 
           // sparkle de 8 pontas nas mais brilhantes: espículas diagonais, mais curtas
           if (s.r > 1.55) {
-            const d = len * 0.42
-            const gd = ctx!.createLinearGradient(x - d, y - d, x + d, y + d)
-            gd.addColorStop(0, `rgba(${rgb}, 0)`)
-            gd.addColorStop(0.5, `rgba(${rgb}, ${a * 0.6})`)
-            gd.addColorStop(1, `rgba(${rgb}, 0)`)
-            ctx!.strokeStyle = gd
-            ctx!.beginPath()
-            ctx!.moveTo(x - d, y - d)
-            ctx!.lineTo(x + d, y + d)
-            ctx!.stroke()
-            const ga = ctx!.createLinearGradient(x - d, y + d, x + d, y - d)
-            ga.addColorStop(0, `rgba(${rgb}, 0)`)
-            ga.addColorStop(0.5, `rgba(${rgb}, ${a * 0.6})`)
-            ga.addColorStop(1, `rgba(${rgb}, 0)`)
-            ctx!.strokeStyle = ga
-            ctx!.beginPath()
-            ctx!.moveTo(x - d, y + d)
-            ctx!.lineTo(x + d, y - d)
-            ctx!.stroke()
+            const d = len * 0.42 * Math.SQRT2
+            ctx!.globalAlpha = a * 0.6
+            spike(img, x, y, d, Math.PI / 4)
+            spike(img, x, y, d, -Math.PI / 4)
           }
+          ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
+          ctx!.globalAlpha = 1
         }
       }
 
@@ -303,33 +344,21 @@ export function Starfield() {
       // lua — presença suave e distante, velando o céu
       const moonX = w * 0.82 + px * 2
       const moonY = h * 0.19 - scrollY * 0.03
-      const mr = Math.max(30, Math.min(w, h) * 0.055)
-      const halo = ctx!.createRadialGradient(moonX, moonY, mr * 0.5, moonX, moonY, mr * 5)
-      halo.addColorStop(0, 'rgba(240, 234, 216, 0.16)')
-      halo.addColorStop(1, 'rgba(240, 234, 216, 0)')
-      ctx!.fillStyle = halo
-      ctx!.beginPath()
-      ctx!.arc(moonX, moonY, mr * 5, 0, Math.PI * 2)
-      ctx!.fill()
-      const disc = ctx!.createRadialGradient(
-        moonX - mr * 0.3,
-        moonY - mr * 0.3,
-        mr * 0.2,
-        moonX,
-        moonY,
-        mr,
-      )
-      disc.addColorStop(0, 'rgba(252, 249, 240, 0.95)')
-      disc.addColorStop(1, 'rgba(220, 216, 202, 0.7)')
-      ctx!.fillStyle = disc
-      ctx!.beginPath()
-      ctx!.arc(moonX, moonY, mr, 0, Math.PI * 2)
-      ctx!.fill()
+      if (moon) {
+        const half = moon.width / dpr / 2
+        ctx!.drawImage(moon, moonX - half, moonY - half, half * 2, half * 2)
+      }
     }
 
     let raf = 0
     let last = performance.now()
     function frame(now: number) {
+      // tela de 120 Hz: o céu não precisa de mais que 60 quadros, e cada um a
+      // mais é bateria e calor
+      if (now - last < 14) {
+        raf = requestAnimationFrame(frame)
+        return
+      }
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
       // easing do mouse
@@ -344,6 +373,9 @@ export function Starfield() {
     }
     function onScroll() {
       scrollY = window.scrollY
+      // a nebulosa sobe devagar com a rolagem, como subia dentro do canvas
+      if (nebulaRef.current)
+        nebulaRef.current.style.transform = `translate3d(0, ${-scrollY * 0.02}px, 0)`
     }
     function onMouse(e: MouseEvent) {
       mouse.tx = e.clientX
@@ -351,6 +383,7 @@ export function Starfield() {
     }
 
     build()
+    onScroll()
     if (reduced) {
       // desenha um quadro estático e para
       draw(0, 0)
@@ -369,5 +402,17 @@ export function Starfield() {
     }
   }, [])
 
-  return <canvas ref={ref} className="pointer-events-none fixed inset-0 z-0" aria-hidden />
+  return (
+    <>
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+        {/* mais alta que a tela: sobe com a rolagem sem mostrar a borda de baixo */}
+        <div
+          ref={nebulaRef}
+          className="absolute inset-x-0 top-0 will-change-transform"
+          style={{ height: 'calc(100lvh + 200vh)', backgroundImage: NEBULA_BG }}
+        />
+      </div>
+      <canvas ref={ref} className="pointer-events-none fixed inset-0 z-0" aria-hidden />
+    </>
+  )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type RefObject } from 'react'
 import type { Finale, PlacedStar } from '../data'
 import { ExuFigure } from './ExuFigure'
 
@@ -103,12 +103,26 @@ function highlightSacred(text: string) {
  * A viagem por um céu: constelação que acende conforme a rolagem. Serve tanto
  * pro céu inteiro de um mundo quanto pro céu de um capítulo (um mês só).
  */
+/**
+ * Folga em volta do quadro do céu, em unidades do desenho. As estrelas de ponta
+ * (a do fecho mora lá no canto) ficam coladas na borda da caixa, e o halo e a
+ * cruz delas eram cortados num quadrado. O svg transborda a caixa nessa medida,
+ * com o viewBox crescendo junto: nada muda de lugar nem de tamanho, só o brilho
+ * ganha espaço. Limitado de propósito (e não `overflow: visible`), pra o
+ * desfoque não ser repintado numa área sem fim a cada quadro da rolagem.
+ */
+const GLOW_PAD = 9
+
+/** Tamanho das estrelas da constelação (corpo, brilho, cruz e pulso), em escala. */
+const K = 0.84
+
 export function NightJourney({
   stars,
   finale,
   seed,
   label,
   emptyNote,
+  color,
 }: {
   stars: PlacedStar[]
   finale?: Finale
@@ -117,8 +131,20 @@ export function NightJourney({
   label: string
   /** frase pro céu que ainda não tem estrela nenhuma */
   emptyNote?: string
+  /**
+   * Cor do capítulo (a mesma do mapa). Sem ela, o céu do começo: corpo prata e
+   * brilho dourado.
+   */
+  color?: string
 }) {
+  const body = color ?? '#fdf7ea'
+  const accent = color ?? '#e6c07a'
   const sectionRef = useRef<HTMLElement>(null)
+  // ids dos gradientes por céu: cada capítulo tem a sua cor, e na página de
+  // tudo vários céus convivem
+  const uid = useId().replace(/:/g, '')
+  const bloomAccent = `bloomA${uid}`
+  const bloomWarm = `bloomW${uid}`
   const p = useSectionProgress(sectionRef)
   const reduced = reducedMotion()
 
@@ -160,6 +186,40 @@ export function NightJourney({
   const height =
     SCENES === 0 ? '100lvh' : `calc(var(--scene-h, 56vh) * ${Math.max(SCENES, 2)} + 44vh)`
 
+  /**
+   * O quadro do céu segue a proporção da caixa onde ele está. Com um viewBox
+   * fixo (100x44) e `meet`, uma caixa mais larga que isso escala o desenho pela
+   * ALTURA e sobra faixa vazia dos dois lados — a constelação nunca chegava na
+   * borda por mais que eu empurrasse as estrelas. Aqui a largura continua sendo
+   * 0–100 (é nela que as estrelas são posicionadas) e é a altura do quadro que
+   * se ajusta, sempre centrada na linha de base do céu: o desenho ocupa a caixa
+   * inteira, de ponta a ponta, e as estrelas continuam redondas.
+   */
+  const skyRef = useRef<HTMLDivElement>(null)
+  const [sky, setSky] = useState({ w: 0, h: 0 })
+  const skyH = sky.w > 0 ? (100 * sky.h) / sky.w : 44
+
+  useEffect(() => {
+    const el = skyRef.current
+    if (!el) return
+    const fit = () => {
+      const { width, height } = el.getBoundingClientRect()
+      if (width > 0 && height > 0) setSky({ w: width, h: height })
+    }
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  // 22 é o meio do céu antigo: o quadro cresce e encolhe em volta dele
+  const skyBox = `${-GLOW_PAD} ${(22 - skyH / 2 - GLOW_PAD).toFixed(2)} ${100 + GLOW_PAD * 2} ${(
+    skyH +
+    GLOW_PAD * 2
+  ).toFixed(2)}`
+  // a mesma folga, em pixels: o svg transborda a caixa exatamente nessa medida
+  const padPx = (sky.w / 100) * GLOW_PAD
+
   return (
     <section
       id="ceu"
@@ -172,20 +232,44 @@ export function NightJourney({
           {label}
         </p>
 
-        {/* céu / constelação */}
+        {/* céu / constelação: a caixa manda no tamanho, o svg preenche ela */}
+        <div
+          ref={skyRef}
+          style={{ left: '3vw', right: '3vw' }}
+          className="absolute top-[23vh] h-[20vh] sm:top-[15vh] sm:h-[46vh]"
+        >
         <svg
-          className="absolute inset-x-[8vw] top-[23vh] h-[20vh] sm:top-[15vh] sm:h-[46vh]"
-          viewBox="0 0 100 44"
+          className="absolute"
+          style={{
+            left: -padPx,
+            top: -padPx,
+            width: sky.w + padPx * 2,
+            height: sky.h + padPx * 2,
+          }}
+          viewBox={skyBox}
           preserveAspectRatio="xMidYMid meet"
           aria-hidden
         >
           <defs>
-            <filter id="glow" x="-120%" y="-120%" width="340%" height="340%">
-              <feGaussianBlur stdDeviation="1.6" />
-            </filter>
-            <filter id="softglow" x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="0.5" />
-            </filter>
+            {/*
+              O brilho das estrelas é um gradiente que já nasce desfocado, no
+              lugar de um círculo com feGaussianBlur: o filtro era refeito a cada
+              quadro da rolagem (a opacidade muda o tempo todo) e era o que mais
+              pesava no céu. O raio do círculo cresce pra cobrir o que o desfoque
+              espalhava.
+            */}
+            {[
+              [bloomAccent, accent],
+              [bloomWarm, '#fff3d6'],
+            ].map(([id, c]) => (
+              <radialGradient key={id} id={id}>
+                <stop offset="0" stopColor={c} stopOpacity="1" />
+                <stop offset="0.25" stopColor={c} stopOpacity="0.9" />
+                <stop offset="0.5" stopColor={c} stopOpacity="0.5" />
+                <stop offset="0.78" stopColor={c} stopOpacity="0.12" />
+                <stop offset="1" stopColor={c} stopOpacity="0" />
+              </radialGradient>
+            ))}
             {/* espículas de difração (brilho em cruz), desbotando nas pontas */}
             <linearGradient id="spikeH" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stopColor="#fff6e2" stopOpacity="0" />
@@ -231,7 +315,8 @@ export function NightJourney({
             />
           ))}
 
-          {/* linhas-mestras entre os momentos: brilho largo + traço nítido */}
+          {/* linhas-mestras entre os momentos: o traço nítido (o brilho largo em volta, sem
+              o filtro de desfoque que pesava, virava uma faixa de borda dura) */}
           {stars.slice(0, -1).map((m, i) => {
             const next = stars[i + 1]
             const frac = clamp((p - revealAt(i)) / (revealAt(i + 1) - revealAt(i)))
@@ -243,21 +328,7 @@ export function NightJourney({
                   x2={next.x}
                   y2={next.y}
                   pathLength={1}
-                  stroke="#e6c07a"
-                  strokeWidth={1.1}
-                  strokeLinecap="round"
-                  strokeDasharray={1}
-                  strokeDashoffset={1 - frac}
-                  opacity={0.12}
-                  filter="url(#softglow)"
-                />
-                <line
-                  x1={m.x}
-                  y1={m.y}
-                  x2={next.x}
-                  y2={next.y}
-                  pathLength={1}
-                  stroke="#e6c07a"
+                  stroke={accent}
                   strokeWidth={0.28}
                   strokeLinecap="round"
                   strokeDasharray={1}
@@ -276,7 +347,7 @@ export function NightJourney({
               x2={finale.x}
               y2={finale.y}
               pathLength={1}
-              stroke="#e6c07a"
+              stroke={accent}
               strokeWidth={0.28}
               strokeLinecap="round"
               strokeDasharray={1}
@@ -288,27 +359,28 @@ export function NightJourney({
           {/* estrelas principais (sparkles) */}
           {stars.map((m, i) => {
             const lit = litOf(p, i)
-            const R = 0.9 + lit * 1.7
+            const R = (0.9 + lit * 1.7) * K
+            const L = (1.6 + lit * 3.2) * K
             return (
               <g key={`s${i}`}>
                 {/* bloom em camadas (quente por fora, claro por dentro) */}
-                <circle cx={m.x} cy={m.y} r={3.6} fill="#e6c07a" opacity={lit * 0.14} filter="url(#glow)" />
-                <circle cx={m.x} cy={m.y} r={2} fill="#fff3d6" opacity={lit * 0.34} filter="url(#glow)" />
+                <circle cx={m.x} cy={m.y} r={6.2 * K} fill={`url(#${bloomAccent})`} opacity={lit * 0.14} />
+                <circle cx={m.x} cy={m.y} r={4.4 * K} fill={`url(#${bloomWarm})`} opacity={lit * 0.3} />
                 {/* espículas de difração (brilho em cruz) */}
                 {lit > 0.02 && (
                   <g opacity={lit}>
                     <rect
-                      x={m.x - (1.6 + lit * 3.2)}
-                      y={m.y - 0.13}
-                      width={(1.6 + lit * 3.2) * 2}
-                      height={0.26}
+                      x={m.x - L}
+                      y={m.y - 0.13 * K}
+                      width={L * 2}
+                      height={0.26 * K}
                       fill="url(#spikeH)"
                     />
                     <rect
-                      x={m.x - 0.13}
-                      y={m.y - (1.6 + lit * 3.2)}
-                      width={0.26}
-                      height={(1.6 + lit * 3.2) * 2}
+                      x={m.x - 0.13 * K}
+                      y={m.y - L}
+                      width={0.26 * K}
+                      height={L * 2}
                       fill="url(#spikeV)"
                     />
                   </g>
@@ -316,16 +388,16 @@ export function NightJourney({
                 {/* corpo de 4 pontas */}
                 <path
                   d={sparkle(m.x, m.y, R)}
-                  fill="#fdf7ea"
+                  fill={body}
                   opacity={lit * 0.95}
                   className={lit > 0.92 && !reduced ? 'animate-twinkle' : undefined}
                   style={{ transformOrigin: `${m.x}px ${m.y}px` }}
                 />
                 {/* núcleo brilhante */}
-                <circle cx={m.x} cy={m.y} r={0.55} fill="#ffffff" opacity={lit} />
+                <circle cx={m.x} cy={m.y} r={0.55 * K} fill="#ffffff" opacity={lit} />
                 {!reduced && i === active && !onFinale && (
-                  <circle cx={m.x} cy={m.y} r={1.4} fill="none" stroke="#e6c07a" strokeWidth={0.22}>
-                    <animate attributeName="r" from="1.4" to="8" dur="2.6s" repeatCount="indefinite" />
+                  <circle cx={m.x} cy={m.y} r={1.4 * K} fill="none" stroke={accent} strokeWidth={0.22 * K}>
+                    <animate attributeName="r" from={1.4 * K} to={8 * K} dur="2.6s" repeatCount="indefinite" />
                     <animate attributeName="opacity" from="0.55" to="0" dur="2.6s" repeatCount="indefinite" />
                   </circle>
                 )}
@@ -337,47 +409,48 @@ export function NightJourney({
           {finale && (
             <g>
               {/* bloom em camadas, maior e mais quente que as demais */}
-              <circle cx={finale.x} cy={finale.y} r={5.6} fill="#e6c07a" opacity={pp * 0.22} filter="url(#glow)" />
-              <circle cx={finale.x} cy={finale.y} r={3} fill="#fff3d6" opacity={pp * 0.42} filter="url(#glow)" />
+              <circle cx={finale.x} cy={finale.y} r={8 * K} fill={`url(#${bloomAccent})`} opacity={pp * 0.22} />
+              <circle cx={finale.x} cy={finale.y} r={5.4 * K} fill={`url(#${bloomWarm})`} opacity={pp * 0.38} />
               {/* espículas de difração — mais longas que as outras estrelas */}
               {pp > 0.02 && (
                 <g opacity={pp}>
                   <rect
-                    x={finale.x - (2.2 + pp * 4.6)}
-                    y={finale.y - 0.16}
-                    width={(2.2 + pp * 4.6) * 2}
-                    height={0.32}
+                    x={finale.x - (2.2 + pp * 4.6) * K}
+                    y={finale.y - 0.16 * K}
+                    width={(2.2 + pp * 4.6) * 2 * K}
+                    height={0.32 * K}
                     fill="url(#spikeH)"
                   />
                   <rect
-                    x={finale.x - 0.16}
-                    y={finale.y - (2.2 + pp * 4.6)}
-                    width={0.32}
-                    height={(2.2 + pp * 4.6) * 2}
+                    x={finale.x - 0.16 * K}
+                    y={finale.y - (2.2 + pp * 4.6) * K}
+                    width={0.32 * K}
+                    height={(2.2 + pp * 4.6) * 2 * K}
                     fill="url(#spikeV)"
                   />
                 </g>
               )}
               {/* corpo de 4 pontas, maior que o dos momentos */}
               <path
-                d={sparkle(finale.x, finale.y, 1.1 + pp * 2.5)}
-                fill="#fdf7ea"
+                d={sparkle(finale.x, finale.y, (1.1 + pp * 2.5) * K)}
+                fill={body}
                 opacity={pp * 0.98}
                 className={pp > 0.9 && !reduced ? 'animate-twinkle' : undefined}
                 style={{ transformOrigin: `${finale.x}px ${finale.y}px` }}
               />
               {/* núcleo brilhante */}
-              <circle cx={finale.x} cy={finale.y} r={0.7} fill="#ffffff" opacity={pp} />
+              <circle cx={finale.x} cy={finale.y} r={0.7 * K} fill="#ffffff" opacity={pp} />
               {/* pulso comemorativo do "sim" */}
               {!reduced && pp > 0.35 && (
-                <circle cx={finale.x} cy={finale.y} r={1.6} fill="none" stroke="#e6c07a" strokeWidth={0.2} opacity={pp}>
-                  <animate attributeName="r" from="1.6" to="9.5" dur="2.8s" repeatCount="indefinite" />
+                <circle cx={finale.x} cy={finale.y} r={1.6 * K} fill="none" stroke={accent} strokeWidth={0.2 * K} opacity={pp}>
+                  <animate attributeName="r" from={1.6 * K} to={9.5 * K} dur="2.8s" repeatCount="indefinite" />
                   <animate attributeName="opacity" from="0.5" to="0" dur="2.8s" repeatCount="indefinite" />
                 </circle>
               )}
             </g>
           )}
         </svg>
+        </div>
 
         {/* scrim: garante leitura do texto sobre o céu (legenda de cinema) */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[82vh] bg-gradient-to-t from-night via-night/95 to-transparent" />
@@ -397,7 +470,7 @@ export function NightJourney({
             )
           ) : onFinale && finale ? (
             <div key="finale" className="mx-auto max-w-xl animate-title-in text-center">
-              <p className="label inline-block rounded-full bg-night-deep/80 px-4 py-1.5 text-ember/90 shadow-[0_0_20px_6px_rgba(4,5,11,0.8)] ring-1 ring-white/10 backdrop-blur-md">
+              <p className="label inline-block rounded-full bg-night-deep/90 px-4 py-1.5 text-ember/90 shadow-[0_0_20px_6px_rgba(4,5,11,0.8)] ring-1 ring-white/10">
                 {finale.label}
                 <span className="mx-2 text-mist">·</span>
                 {fmtDate(finale.date)}
@@ -424,7 +497,7 @@ export function NightJourney({
             </div>
           ) : (
             <div key={active} className="mx-auto max-w-xl animate-title-in text-center">
-              <p className="label inline-block rounded-full bg-night-deep/80 px-4 py-1.5 text-ember/90 shadow-[0_0_20px_6px_rgba(4,5,11,0.8)] ring-1 ring-white/10 backdrop-blur-md">
+              <p className="label inline-block rounded-full bg-night-deep/90 px-4 py-1.5 text-ember/90 shadow-[0_0_20px_6px_rgba(4,5,11,0.8)] ring-1 ring-white/10">
                 {(active + 1).toString().padStart(2, '0')} / {N.toString().padStart(2, '0')}
                 <span className="mx-2 text-mist">·</span>
                 {fmtDate(stars[active].date)}

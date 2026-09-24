@@ -140,6 +140,368 @@
   animation: lb-in 0.22s ease-out both;
 }
 
+/* barrinhas do equalizador, no player da música tema do cinema */
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* o clima de cada filme atrás da ficha aberta (Ambience.tsx). Cada partícula
+   são três caixas: a de fora anda pela tela, a do meio balança, a de dentro
+   gira ou vira de face. Só transform e opacity — nada de blur, que trava no
+   celular. */
+.ambience {
+  animation: amb-in 1.6s ease-out both;
+}
+@keyframes amb-in {
+  from {
+    opacity: 0;
+  }
+}
+.amb-travel {
+  top: 0;
+  left: 0;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+/* atravessar de cima a baixo, de baixo a cima, de lado */
+.amb-rise {
+  animation-name: amb-rise;
+}
+@keyframes amb-rise {
+  from {
+    transform: translateY(110vh);
+  }
+  to {
+    transform: translateY(-20vh);
+  }
+}
+.amb-fall {
+  animation-name: amb-fall;
+}
+@keyframes amb-fall {
+  from {
+    transform: translateY(-20vh);
+  }
+  to {
+    transform: translateY(110vh);
+  }
+}
+.amb-across {
+  animation-name: amb-across;
+}
+@keyframes amb-across {
+  from {
+    transform: translateX(-20vw);
+  }
+  to {
+    transform: translateX(110vw);
+  }
+}
+
+/* o escudo quicando: bate no alto e no pé da tela alternando, enquanto atravessa */
+.amb-ricochet {
+  animation-name: amb-ricochet;
+}
+@keyframes amb-ricochet {
+  0% {
+    transform: translate(-15vw, var(--y1));
+  }
+  25% {
+    transform: translate(22vw, var(--y2));
+  }
+  50% {
+    transform: translate(50vw, var(--y1));
+  }
+  75% {
+    transform: translate(78vw, var(--y2));
+  }
+  100% {
+    transform: translate(115vw, var(--y1));
+  }
+}
+
+/* aparece crescendo, paira subindo um tico e some: não atravessa, assombra */
+.amb-haunt {
+  animation-name: amb-haunt;
+  animation-timing-function: ease-in-out;
+}
+@keyframes amb-haunt {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.55);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.9);
+  }
+}
+
+/* o raio: escuro quase o tempo todo, e o clarão piscando duas vezes */
+.amb-strike {
+  animation-name: amb-strike;
+}
+@keyframes amb-strike {
+  0%,
+  55% {
+    opacity: 0;
+  }
+  56% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 0.9;
+  }
+  62% {
+    opacity: 0.3;
+  }
+  66% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* o tentáculo sobe do pé da tela, fica um pouco e afunda de novo */
+.amb-emerge {
+  top: auto;
+  bottom: 0;
+  animation-name: amb-emerge;
+  animation-timing-function: ease-in-out;
+}
+@keyframes amb-emerge {
+  0%,
+  100% {
+    transform: translateY(105%);
+  }
+  45%,
+  62% {
+    transform: translateY(var(--reach));
+  }
+}
+
+/* a aranha desce no fio e sobe de volta */
+.amb-dangle {
+  animation-name: amb-dangle;
+  animation-timing-function: ease-in-out;
+}
+@keyframes amb-dangle {
+  0%,
+  100% {
+    transform: translateY(-120%);
+  }
+  45%,
+  62% {
+    transform: translateY(var(--reach));
+  }
+}
+/* o fio sai do alto da cabeça da aranha (a 26% do desenho) e sobe pra fora da tela */
+.amb-thread {
+  position: absolute;
+  bottom: 74%;
+  left: 50%;
+  width: 1px;
+  height: 130vh;
+  background: rgba(245, 241, 232, 0.28);
+}
+
+/* pegada: marca, fica e vai apagando depois que a próxima já apareceu */
+.amb-steps {
+  animation-name: amb-step;
+  animation-fill-mode: both;
+}
+@keyframes amb-step {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  3% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  45% {
+    opacity: 1;
+  }
+  70%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* holofote pendurado no alto; o balanço de pêndulo vem do amb-sway */
+.amb-beam {
+  top: -2%;
+  transform: translateX(-50%);
+  animation-name: amb-beam;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+@keyframes amb-beam {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* o homem-aranha na teia: aparece, faz meio arco de pêndulo (o amb-sway, no
+   mesmo compasso) e some antes de voltar */
+.amb-swing {
+  top: -1%;
+  animation-name: amb-swing;
+}
+@keyframes amb-swing {
+  0% {
+    opacity: 0;
+  }
+  6%,
+  40% {
+    opacity: 1;
+  }
+  49%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* teia de canto: cresce a partir do canto (transform-origin vem da partícula) */
+.amb-corner {
+  animation-name: amb-corner;
+  animation-timing-function: ease-out;
+}
+@keyframes amb-corner {
+  0% {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  78% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+/* a aurora: cortina larga deslizando devagar de um lado pro outro (sem escala:
+   o desfoque de dentro dela fica pintado uma vez só) */
+.amb-aurora {
+  left: -20%;
+  animation-name: amb-aurora;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+@keyframes amb-aurora {
+  from {
+    opacity: 0.8;
+    transform: translateX(-5%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(5%);
+  }
+}
+
+/* as folhas da aurora cintilando cada uma no seu tempo */
+.amb-shimmer {
+  animation: amb-shimmer ease-in-out infinite alternate;
+}
+@keyframes amb-shimmer {
+  from {
+    opacity: 0.55;
+    transform: translateX(-0.6%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0.6%);
+  }
+}
+
+/* balanço de lado e inclinação (o pêndulo do holofote, a risada do jack) */
+.amb-sway {
+  animation: amb-sway ease-in-out infinite alternate;
+}
+@keyframes amb-sway {
+  from {
+    transform: translateX(calc(var(--sway) * -1)) rotate(calc(var(--tilt) * -1));
+  }
+  to {
+    transform: translateX(var(--sway)) rotate(var(--tilt));
+  }
+}
+.amb-spin {
+  animation: amb-spin linear infinite;
+}
+@keyframes amb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* moeda e nota virando de face */
+.amb-flip {
+  animation: amb-flip linear infinite;
+}
+@keyframes amb-flip {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+/* a runa: o contorno se risca, depois acende por dentro — no mesmo compasso
+   do aparecer e sumir (--d e --delay vêm da partícula) */
+.amb-rune-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: amb-rune-line var(--d) ease-out var(--delay) infinite;
+}
+@keyframes amb-rune-line {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  40%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+.amb-rune-fill {
+  animation: amb-rune-fill var(--d) ease-in-out var(--delay) infinite;
+}
+@keyframes amb-rune-fill {
+  0%,
+  28% {
+    fill-opacity: 0;
+  }
+  50%,
+  100% {
+    fill-opacity: 1;
+  }
+}
+
 /* no mobile, encurta o passo de scroll por estrela pra não exigir rolagem infinita */
 @media (max-width: 640px) {
   #ceu {
@@ -160,5 +522,8 @@
   }
   .grain::after {
     animation: none;
+  }
+  .ambience {
+    display: none;
   }
 }

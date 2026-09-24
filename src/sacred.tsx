@@ -14,6 +14,8 @@ export const SACRED_NAMES = [
   'Seo Tranca Rua',
   'Seo Samambaia',
   'Seo João Sorriso',
+  'Seo Zé Pilintra',
+  "Pai Antônio D'Angola",
   'Iemanjá',
   'Oxóssi',
   'Oxum',

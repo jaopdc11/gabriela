@@ -12,7 +12,11 @@ const fmtRange = (start: Date, end: Date) => {
   return `${fmtDay(start)} — ${fmtDay(last)} ${last.getFullYear()}`
 }
 
-/** Troca de capítulo: as setas andam de mês em mês, as pílulas pulam direto. */
+/**
+ * Troca de capítulo: os numerais em fila, do jeito de uma cartela de filme. Quem
+ * diz o nome do mês é a cartela logo abaixo — aqui em cima é só o romano, e o
+ * fio âmbar embaixo do que está aberto.
+ */
 export function ChapterNav({
   chapters,
   current,
@@ -22,43 +26,36 @@ export function ChapterNav({
   current: number
   onChange: (n: number) => void
 }) {
-  const i = chapters.findIndex((c) => c.n === current)
-  const prev = chapters[i - 1]
-  const next = chapters[i + 1]
-
-  const arrow = (c: Chapter | undefined, label: string, d: string) => (
-    <button
-      onClick={() => c && onChange(c.n)}
-      disabled={!c}
-      aria-label={label}
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-mist transition-colors hover:text-star disabled:opacity-25 disabled:hover:text-mist"
-    >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <path d={d} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </button>
-  )
-
   return (
-    <div className="flex max-w-full items-center gap-1 rounded-full border border-white/10 bg-night-deep/60 p-1 backdrop-blur-md">
-      {arrow(prev, 'Mês anterior', 'M15 5l-7 7 7 7')}
-      <div className="no-scrollbar flex items-center gap-1 overflow-x-auto">
-        {chapters.map((c) => (
+    <div className="no-scrollbar flex max-w-full items-center gap-2 overflow-x-auto px-2 sm:gap-4">
+      {chapters.map((c) => {
+        const open = c.n === current
+        return (
           <button
             key={c.n}
             onClick={() => onChange(c.n)}
-            aria-current={c.n === current ? 'true' : undefined}
-            className={`label shrink-0 rounded-full px-3 py-1.5 transition-colors ${
-              c.n === current
-                ? 'bg-ember/15 text-ember ring-1 ring-ember/40'
-                : 'text-mist hover:text-star'
+            aria-current={open ? 'true' : undefined}
+            aria-label={`capítulo ${c.roman}, ${c.name}`}
+            className={`group relative flex h-11 min-w-[2.75rem] shrink-0 items-center justify-center font-display text-xl tracking-title transition-colors duration-500 sm:text-2xl ${
+              open ? 'text-ember' : 'text-mist/60 hover:text-star'
             }`}
           >
-            {c.nav}
+            <span style={open ? { textShadow: '0 0 24px rgba(230, 192, 122, 0.35)' } : undefined}>
+              {c.roman}
+            </span>
+
+            {/* o fio embaixo: cresce no capítulo aberto, insinua no hover */}
+            <span
+              aria-hidden
+              className={`absolute bottom-1.5 left-1/2 h-px -translate-x-1/2 bg-current transition-all duration-500 ${
+                open
+                  ? 'w-5 opacity-90 shadow-[0_0_10px_rgba(230,192,122,0.7)]'
+                  : 'w-2 opacity-0 group-hover:opacity-40'
+              }`}
+            />
           </button>
-        ))}
-      </div>
-      {arrow(next, 'Mês seguinte', 'M9 5l7 7-7 7')}
+        )
+      })}
     </div>
   )
 }
@@ -97,15 +94,6 @@ export function ChapterCard({
         <p className="label mt-8 animate-title-in text-ember/80" style={delay(1000)}>
           {fmtRange(chapter.start, chapter.end)}
         </p>
-
-        {chapter.current && (
-          <p
-            className="label mt-5 inline-block animate-title-in rounded-full bg-ember/10 px-3.5 py-1.5 text-ember/90 ring-1 ring-ember/30"
-            style={delay(1200)}
-          >
-            acontecendo agora
-          </p>
-        )}
       </div>
 
       {/* a seta aponta pro que vem primeiro: a carta do mês, se tiver */}

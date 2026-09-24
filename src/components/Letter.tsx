@@ -52,17 +52,45 @@ export function Reveal({
   )
 }
 
-/** Uma frase-chave, grande e em âmbar, que quebra o ritmo da carta. */
-export function Beat({ children, big = false }: { children: ReactNode; big?: boolean }) {
+/**
+ * Uma frase-chave, grande e em âmbar, que quebra o ritmo da carta. Com `gloss`,
+ * cada linha ganha a tradução pequenininha logo embaixo dela (linha por linha,
+ * na mesma ordem) — pra reza em iorubá.
+ */
+export function Beat({
+  children,
+  big = false,
+  gloss,
+}: {
+  children: string
+  big?: boolean
+  gloss?: string
+}) {
+  const size = big ? 'text-3xl sm:text-5xl' : 'text-2xl sm:text-4xl'
+  const text = 'mx-auto max-w-2xl font-display font-light italic leading-tight text-ember'
+  if (gloss) {
+    const lines = children.split('\n').map((l) => l.trim())
+    const glosses = gloss.split('\n').map((l) => l.trim())
+    return (
+      <Reveal>
+        <div className={`${text} ${size} space-y-3 sm:space-y-4`}>
+          {lines.map((line, i) => (
+            <p key={i}>
+              {line}
+              {glosses[i] && (
+                <span className="mt-1 block font-sans text-xs not-italic tracking-wide text-mist sm:text-sm">
+                  {glosses[i]}
+                </span>
+              )}
+            </p>
+          ))}
+        </div>
+      </Reveal>
+    )
+  }
   return (
     <Reveal>
-      <p
-        className={`mx-auto max-w-2xl font-display font-light italic leading-tight text-ember ${
-          big ? 'text-3xl sm:text-5xl' : 'text-2xl sm:text-4xl'
-        }`}
-      >
-        {children}
-      </p>
+      <p className={`${text} ${size} whitespace-pre-line`}>{children}</p>
     </Reveal>
   )
 }
@@ -152,7 +180,7 @@ export function MonthLetter({
         ) : 'verses' in block ? (
           <Verses key={i} lines={block.verses} />
         ) : (
-          <Beat key={i} big={block.big}>
+          <Beat key={i} big={block.big} gloss={block.gloss}>
             {block.beat}
           </Beat>
         ),

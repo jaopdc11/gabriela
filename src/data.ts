@@ -9,6 +9,13 @@ export type Milestone = {
    */
   x?: number
   y?: number
+  /**
+   * Força o capítulo (mês) em que a estrela entra, ignorando a data. Serve pro
+   * momento que ACONTECEU antes, mas que só virou história agora — a estrela
+   * mostra o dia de verdade e mora no mês em que a ficha caiu. Sem isso, a data
+   * manda, que é o normal.
+   */
+  chapter?: number
 }
 
 /** Estrela com posição já resolvida (o que a constelação desenha). */
@@ -53,14 +60,15 @@ export type MonthMark = {
 /**
  * Um bloco da carta do mês:
  *  - texto solto → um parágrafo normal;
- *  - `{ beat }`  → a frase-chave em âmbar, que quebra o ritmo (`big` = fecho);
+ *  - `{ beat }`  → a frase-chave em âmbar, que quebra o ritmo (`big` = fecho;
+ *                  `gloss` = a tradução, linha por linha, pequenininha embaixo);
  *  - `{ verses }`→ uma estrofe: linhas curtas, uma embaixo da outra, do jeito
  *                  que sai quando eu escrevo em lista ("cada olhar, cada
  *                  risada...") e a quebra faz parte do que tá sendo dito.
  */
 export type LetterBlock =
   | string
-  | { beat: string; big?: boolean }
+  | { beat: string; big?: boolean; gloss?: string }
   | { verses: string[] }
 
 /**
@@ -308,6 +316,66 @@ E aí eu fiz uma coisa que eu jamais imaginei que sairia de mim: dediquei Pixote
 Mas o que de verdade mexeu comigo daquela noite não foi nada disso. A gente tava tirando fotos, e numa delas eu te peguei distraída, só olhando pra mim. E ali dá pra ver o brilho no teu olho quando tu me olha. Puta merda, vida. Aquele jeitinho, aquele brilho, é a prova que eu não sei arranjar em lugar nenhum de que eu sou amado. Ninguém consegue fingir isso numa foto que nem sabia que tava sendo tirada
 Eu guardo essa foto como quem guarda um documento. Nos dias em que a minha cabeça me disser que eu não mereço, que eu sou demais pra alguém aguentar, eu vou olhar pro teu olho naquela foto e calar a boca dela. Foi só um sábado num pagode, e eu levei dele a coisa mais importante do mundo`,
   },
+  {
+    date: new Date(2026, 7, 29),
+    title: 'O show do Ferrugem',
+    description: `FERRUGEM, gatinha. O Ferrugem. Meu cantor de pagode favorito da vida, que eu sempre ouvi sozinho só idealizando, e eu ali com tu do meu lado E ELE LÁ (na minha cabeça ele é nosso padrinho agora, fodase)
+E eu cantei PRA TI, na tua cara de novo no mesmo pique do pixote. E a gente dançou agarradinho a noite inteira (tenho que te ensinar mas blz kkkkkkkkk)
+Aí teve a parte ruim. Um cara mexeu contigo e eu fui atrás. Eu ia quebrar ele no murro, tu sabe. E tu me segurou
+Não vou mentir que eu me senti péssimo, impotente pra caralho. Depois a gente sentou e conversou e ficou tudo certo, mas na hora foi foda
+E é isso que eu amo na gente, e que tu falou pra mim esses dias. A gente sempre resolve quando dá merda. O clima ficou péssimo na hora,  em cinco minutos a gente tava cantando e curtindo de novo. Eu AMO isso na gente, essa coisa que o nosso amor permite de passarmos por cima de tudo rapidinho, porque a nossa companhia vale mais. Bem mais
+Depois a gente foi na praia. Tirar foto e limpar as minhas guias no mar. Puta noite, vida
+E do nada me deu uma vontade de fazer uma entrega pro Seo Zé Pilintra, e peguei uma cerveja pra ele. E tu falou que queria fazer uma também. Eu achei isso lindo demais, gatinha
+(a gente ainda não fez, as breja tão na tua casa esperando KKKKKKKKKKKKKK)
+E não é à toa que as minhas fotos favoritas da gente agora são de depois daquele show`,
+  },
+  {
+    date: new Date(2026, 8, 7),
+    title: 'A gira de preto velho, e o teu obi',
+    description: `Tu já tinha ido no meu terreiro, no meu amaci, mas dessa vez foi na gira. Gira de preto velho
+E tu tirou o teu orixá. E DEU IEMANJÁ. KKKKKKKKKKKKKKKKKKKKKK eu tinha chutado aruanda inteira antes e a ÚNICA QUE NÃO CHUTEI era a certa. Baita mediunidade tmj. Depois eu fiquei rindo sozinho de burro que eu sou, porque é óbvio né. É água. Sempre foi água com a gente: foi na praia que eu me apaixonei por ti, foi no rio que eu te ensinei o banho de ervas, e é água no nosso jeito também. Tudo flui, nada trava, e a gente conversa fundo igual o mar. Tava na minha cara o tempo todo
+E tu sentou com o Pai Antônio D'Angola. Aquele preto velho já me salvou uma vez e disso eu não esqueço nunca. E nem interessa exatamente o que ele te falou (foi o que eu já tinha te dito, aliás, ponto pra mim rs), o negócio foi tu ali na frente dele. Ele me conhece por dentro. Agora conhece tu também
+E tu me esperou fazer a minha função. Pra ti deve ter sido só esperar, mas ninguém espera, gatinha. Ninguém. As pessoas acham lindo de longe e vazam na hora que o trabalho começa. Tu ficou até o fim
+E aí a gente terminou a noite carregando aquela estante na rua KKKKKKKKKKKKKKKKKKK. Tu comigo no congá e tu comigo segurando a outra ponta do móvel`,
+  },
+  {
+    date: new Date(2026, 8, 12),
+    title: 'O evento canônico masculino',
+    description: `Passei pelo evento canônico masculino, vida KKKKKKKKKKKKKKKKKKK. A gente se empolgou e eu SURTEI. Em dois minutos a minha cabeça já tinha me feito pai, já tinha chá revelação, o batizado do andarilho do abismo (sim, fica shiu), e não sei o que lá, e CARALHO eu tenho 19 anos, porra, tá amarrado KKKKKKKKKKKKKKKKKKKK
+E o melhor de tudo é que tu tava tranquila. Tu de boa, tranquilaça (e com razão no caso mas enfim). Quem tava passando mal era eu KKKKKKKKKKKKKKKKK. E aí tu começou a ficar nervosa por MINHA causa, e o meu desespero acabou te contaminando, o que só piorou tudo KKKKKKKKKKKKKK. Desculpa, vida, tu nem tinha entrado nessa, chapei firme
+Eu fui na farmácia comprar a pílula por desencargo de consciência, e no fim tu nem tomou na hora. E deu tudo certo, óbvio que deu, viva o sus
+E aí essa semana tu me assusta com isso DE NOVO, do nada inventando de fazer teste de gravidez KKKKKKKKKKKKKKKKKKKKKK. Porra, gatinha, paia tá? Enfim obviamente deu negativo
+(eu to escrevendo isso na terça de manhã, a gente vai fazer o teste hoje, pelo amor de deus que eu esteja certo KKKKKKKKKKKKKKKKKKKKKKKKKKKK)`,
+  },
+  {
+    date: new Date(2026, 8, 13),
+    title: 'O domingo em que tu chorou',
+    description: `A gente viu o Diário de uma Paixão, e foi a primeira vez na vida que eu te vi chorar. Eu tinha te visto brava (eu acho), tinha te visto cansada, tinha te visto rindo pra caralho, mas chorando, nunca. E eu fiquei ali, meio sem saber o que fazer com o tamanho daquilo, entendendo que tinha acabado de me ser mostrada uma coisa que tu não mostra. No desespero tentei te consolar e sei lá se ajudou KKKKKKKKKKKKKKKKKKKKKKKK
+Aí eu comecei a me declarar. E vou ser sincero: foi um pouco de propósito sim KKKKKKKKK. Não que eu tenha feito de sacanagem pra te ver chorar de novo (talvez um pouco), mas tu tava ali aberta na minha frente, eu me emocionei junto, e quando eu me emociono o que sai de mim é declaração, tu já sabe como é. Aí a gente chorou junto, os dois, no meio do que eu tava falando. Foi lindo pra caralho, vida
+E cara, te ver chorando com o que EU tava dizendo (mesmo que tu já estivesse chorando e enfim)... porra. O que eu falo chega em ti assim
+Mas o que mais me pegou nem foi tu ter chorado. Foi tu ter CONSEGUIDO chorar. Porque soltar na frente de alguém é foda, e tu soltou na minha frente, sem se esconder e sem ficar pedindo desculpa. Tu confiou em mim pra chorar, gatinha. Desculpa, mas foi lindo te ver chorar
+E mais tarde eu agradeci. A Oxóssi, meu pai, e à Iemanjá, nossa mãe. Porque é bem o que eu falei pra ti: eu pedia tanto um amor pra espiritualidade, que meu pai ouviu, foi falar com a minha mãe pra ver como ia resolver, e ela desenrolou uma filha dela kkkkkkkkkkkk. Uma semana antes tu tava no meu congá tirando o teu orixá, e agora tu tava chorando comigo na cama, e é tudo a mesma coisa, vida, é tudo a mesma linha. A mulher que eu amo é da mesma água que eu, e eu não acredito nem por um segundo que isso seja coincidência. Eu não sei rezar bonito, tu sabe que isso não é comigo. Mas eu sou grato pra caralho, e eu vou repetir isso todo dia que eu puder. Okê Arô, meu pai. Odoyá, minha mãe. Obrigado por ela.`,
+  },
+  {
+    date: new Date(2026, 8, 20),
+    title: 'A nega maluca, e tu me ensinando',
+    description: `Foi a coisa mais besta que aconteceu nesse mês e é uma das que eu mais gostei. A gente fez um bolo (eu, no caso rs). 
+    E eu preciso escrever o que isso mexeu em mim, porque não é sobre bolo. Eu aprendi tudo na vida sozinho, vida. Tudo. A minha fé eu aprendi sozinho, a me cuidar eu aprendi sozinho, e quando eu não sei fazer uma coisa eu prefiro quebrar a cara calado a perguntar pra alguém. Ali eu não sabia e eu perguntei. E tu me ensinou sem pressa e sem rir da minha cara, e eu fui fazendo do jeito que tu ia falando (mesmo contigo indo total contra a receita mas tá kkkkkkkkkk).
+    E o engraçado é que eu nem comi. Eu tava enjoado pra cacete com esse tanto de remédio, o bolo saiu do forno e não desceu. E não me fez falta nenhuma, porque o gostoso não era comer. Era fazer. Fazer PRA GENTE (no caso descobri depois que era pra ti mas ok kkkkkkkk).  pra quem fazer as coisas, e eu ainda tô me acostumando com o tamanho disso`
+  },
+  {
+    // aconteceu em julho, mas só virou história esse mês, depois que ela tirou
+    // Iemanjá — por isso a data é a de verdade e o capítulo é forçado no 2
+    date: new Date(2026, 6, 18),
+    chapter: 2,
+    title: 'O mesmo ponto, nas duas cabeças',
+    description: `Menção honrosa a isso aqui, que já passou, mas só agora eu juntei as peças
+    Foi em julho, antes de tu ter orixá. Quando a gente foi na praia e nós dois acordamos com um ponto de iemanjá na cabeça. Cheguei na tua casa e falei meio de qualquer jeito: "pô, tô com um ponto de Iemanjá na cabeça o dia todo". E tu falou que também tava. Ali mesmo eu gelei.
+    Meu coronário formigou na hora. Perguntei qual, e tu foi procurando. Eu cantarolei morrendo de medo, porque nem era pra tu conhecer aquilo: "seu colar é de concha...". E tu travou. Travou e botou pra tocar no celular. Eu me arrepiei inteiro, vida, e eu ainda não sabia o porquê
+    Porque tem a concha também. No dia da praia, o dia em que a gente se apaixonou, uma onda chegou na gente e deixou uma concha na areia. Aí esse mês tu vai na gira e Iemanjá é tua mãe de cabeça, tipo??? KKKKKKKKKKKKKKKKKKK. 
+    Mamãe tava abençoando a gente, vida.
+    (e tu ainda me perde a concha KKKKKKKKKKKKKKKKKKK)`,
+  },
 ]
 
 /**
@@ -426,6 +494,151 @@ mas que seja infinito enquanto dure.`,
     ],
     signature: 'teu Jão',
   },
+  2: {
+    // o ponto que a gente acordou com ele na cabeça no mesmo dia, cada um na sua
+    // casa, em 18/07/2026. cheguei na casa dela e falei "tô com um ponto de
+    // Iemanjá o dia todo", ela disse que também tava, eu cantarolei "seu colar é
+    // de concha" com medo, porque nem era pra ela conhecer — e ela travou e botou
+    // pra tocar no celular. e a concha do verso é a concha que a onda deixou na
+    // praia no dia em que eu me apaixonei por ela, quase dois meses antes de ela
+    // tirar Iemanjá na gira
+    epigraph: {
+      text: `seu colar é de concha
+seu vestido se arrasta na areia
+ela tem cheiro de mar
+ela sabe cantar, ponto de sereia`,
+      author: 'Jonathan Silva e Kiko Dinucci, Ciranda pra Janaína',
+    },
+    opening: 'Gabi,',
+    blocks: [
+      {
+        verses: [
+          'dois meses de nós',
+          'dois meses desde que eu escolhi sentir medo e ir mesmo assim',
+          'dois meses desde que eu tenho um lugar certo pra voltar',
+          'dois meses desde que eu não sou mais a pessoa mais sozinha da sala',
+          'dois meses desde que eu tenho um lar.'
+        ],
+      },
+      'tu me disse esses dias que eu pareço mais feliz. mais alegre, mais leve ultimamente',
+      { beat: 'mas é óbvio, né gatinha?' },
+      {
+        verses: [
+          'como eu não poderia estar...',
+          'se eu acordo e a primeira coisa que eu vejo é o teu rostinho lindo',
+          'se tem alguém no mundo que quer saber como foi o meu dia, e quer de verdade',
+          'se eu não preciso mais explicar a minha cabeça inteira pra poder ser aceito',
+          'se eu descobri que dá pra ser amado simplesmente por ser eu',
+          'se eu aprendi que eu posso falhar e que isso não é o fim do mundo',
+        ],
+      },
+      {
+        verses: [
+          'e como eu não poderia estar',
+          'se o melhor pedaço do meu dia é a gente agarradinho debaixo das cobertas',
+          'se tu vira o celular pra mim com aquele "tem vídeo pra ti" e eu fico igual uma criança ganhando brinquedo',
+          'se tu passou o dia inteiro guardando vídeo besta só pra ver a minha cara quando eu visse',
+          'se eu fico esperando essa hora desde que eu acordo, gatinha. o dia TODO',
+        ],
+      },
+      {
+        verses: [
+          'naquele domingo eu fiz uma nega maluca contigo guiando, e a receita da tua mãe',
+          'eu nem comi na hora, de tão enjoado kkkkkkkkk, e mesmo assim foi a melhor parte do meu dia',
+          '(mas papo reto que eu amassei ali rs)',
+        ],
+      },
+      { beat: 'porque o gostoso não era o bolo, vida. era cozinhar contigo' },
+      {
+        verses: [
+          'como eu não poderia estar leve',
+          'se tu foi no meu terreiro, entrou na minha casa, pisou no meu chão',
+          'se tu tirou o teu orixá e era a minha mãe aparecendo',
+          'se tu sentou na frente do mesmo Pai Antônio D\'Angola que me salvou (e ele te disse exatamente oq eu tinha dito, ponto pra mim rs), e depois ainda esperou eu fazer a minha função sem pressa nenhuma',
+          'e se depois de tudo isso tu ainda carregou uma estante comigo pela rua KKKKKKKKKKKKKKKKK (desculpa)',
+        ],
+      },
+      {
+        verses: [
+          'e desde que eu soube do teu orixá eu não paro de pensar na concha',
+          'aquela que a onda deixou na areia no dia em que a gente se apaixonou',
+          'a que tu perdeu KKKKKKKKKKKKKKKK',
+          'e no ponto que amanheceu na cabeça de nós dois depois, cada um na sua casa, antes de tu saber de qualquer coisa',
+        ],
+      },
+      { beat: 'era ela desde o começo, vida. mamãe já tava ali, muito antes da gente ter nome pra gente' },
+      {
+        verses: [
+          'como eu não poderia estar mais feliz',
+          'se tu chorou na minha frente',
+          'se tu confiou em mim pra chorar, e conseguiu',
+          'se tu chorou com as coisas que eu te falava, e eu vi o que eu sinto chegando em ti',
+        ],
+      },
+      { beat: 'eu tô mais leve, meu amor. e é porque eu parei de existir sozinho' },
+      'e a diferença que isso faz em mim é uma coisa que eu não consigo te explicar direito. eu passei a vida inteira achando que eu era demais pra qualquer um aguentar, que ninguém iria querer isso, e tu simplesmente me pega. sem susto, sem cara feia, sem me fazer sentir que eu sou um peso',
+      {
+        verses: [
+          'esse mês eu tive mais episódios de sensibilidade do que eu gostaria',
+          'e em todos, sem exceção, tu me acolheu e cuidou de mim',
+          'tu me ajudou a falar do meu TEA em voz alta sem sentir vergonha, coisa que eu nunca fiz com ninguém',
+          'e tu secou o meu cabelo porque eu reclamei da textura dele molhado na minha pele',
+          'eu quase chorei ali, e não era de agonia',
+          'eu SEMPRE tive vergonha do meu TEA, desde criança. mas contigo ele não soa como um problema mais',
+        ],
+      },
+      { beat: 'eu amo o teu cuidado, meu amor. e pela primeira vez na vida eu não me sinto um peso quando alguém cuida de mim' },
+      {
+        verses: [
+          'eu não apago mais a luz',
+          'a vergonha virou uma memória',
+          'a autoestima que eu mal construí, quem firmou mesmo foi tu',
+          'a gente foi tendo coragem de se entregar e de pedir, um pedido de cada vez',
+          'já teve não, e o não não quebrou nada',
+          'eu cheguei de começo MORTO de nervoso, e hoje eu confio no meu taco KKKKKKKKKKKKKKKKKKKKK amém',
+        ],
+      },
+      { beat: 'o que me dava nersovo virou alívio e brincadeira, gatinha. a gente ri no meio da transa e não perde o clima, e porra, eu acho isso lindo pra caralho' },
+      {
+        verses: [
+          'eu preciso de ti',
+          'minha alma te chama',
+          'minha carne te deseja',
+          'meu coração bate pra ti',
+          'e isso não é jeito bonito de falar não, vida. é literal',
+          'é TUDO em mim querendo o mesmo lugar',
+          'e o lugar é tu: de noite debaixo das cobertas, e de manhã quando eu abro o olho e tu tá ali',
+          'eu não sei nem o que eu fiz pra ganhar isso, então eu faço a única coisa que eu sei fazer',
+          'eu agradeço',
+        ],
+      },
+      {
+        verses: [
+          'e tem hora que eu dissocio',
+          'acho que tô sonhando',
+          'não parece real',
+          'eu fico olhando pra ti e esperando a hora que eu vou acordar',
+          'porque não é possível que isso seja pra mim, sabe? logo eu, que sou só euzinho kkkkkkkkkk',
+          'aí tu se mexe do meu lado, e eu volto',
+          'é real. tu é real, gatinha. EU CONFERI',
+          'e aí eu agradeço de novo, assim...',
+        ],
+      },
+      // a reza em iorubá, com a tradução embaixo de cada linha
+      {
+        beat: `Mo dúpẹ́ lọ́wọ́ yín, Ọ̀ṣọ́ọ̀sì, Bàbá mi.
+              Mo dúpẹ́ lọ́wọ́ yín, Yemọja, Ìyá mi.
+              Mo dúpẹ́ fún un.
+              Àṣẹ ò.`,
+        gloss: `agradeço ao senhor, Oxóssi, meu pai.
+                agradeço à senhora, Iemanjá, minha mãe.
+                agradeço por ela.
+                axé.`,
+      },
+      { beat: 'eu te amo pra caralho.', big: true },
+    ],
+    signature: 'teu Jão',
+  },
 }
 
 /**
@@ -440,6 +653,7 @@ mas que seja infinito enquanto dure.`,
  */
 export const monthTracks: Record<number, string[]> = {
   1: ['/mes-01.mp3'], // nem de graça — a música do primeiro mês
+  2: ['/mes-02.mp3'], // ciranda pra janaína — a mãe Iemanjá do fecho do mês dois
 }
 
 /** Os dois mundos: o começo (até o sim) e o namoro (depois dele). */
@@ -460,7 +674,7 @@ export const worlds: World[] = [
     // trilha própria do namoro — é só colocar os arquivos em public/ com esses nomes
     tracks: ['/namoro.mp3', '/namoro2.mp3', '/namoro3.mp3'],
     seed: 20260723,
-    arc: { x0: 8, x1: 90, base: 21, amp: 7, freq: 0.75, phase: 0.6 },
+    arc: { x0: 3, x1: 96, base: 21, amp: 7, freq: 0.75, phase: 0.6 },
     // sem `stars`: aqui o céu é montado mês a mês, um capítulo por vez
     milestones: namoroMilestones,
   },

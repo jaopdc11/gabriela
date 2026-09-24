@@ -25,8 +25,6 @@ type Layer = {
   stars: PlacedStar[]
   finale?: Finale
   /** deslocamento da camada, pra sobrepor sem as estrelas coincidirem */
-  dx: number
-  dy: number
   /** força das linhas da constelação */
   line: number
   /** cor do corpo das estrelas dessa camada */
@@ -44,13 +42,57 @@ const SILVER = '#fdf7ea'
  */
 const CHAPTER_COLORS = ['#e8b869', '#93b8ea', '#c9a3d4', '#8fd0c0']
 
+/** A cor do mês `n` do namoro — a mesma no mapa e no céu do capítulo. */
+export const chapterColor = (n: number) => CHAPTER_COLORS[(n - 1) % CHAPTER_COLORS.length]
+
 /**
- * Sobreposição por camada: cada capítulo do namoro usa a mesma curva, então sem
- * um empurrãozinho as estrelas de meses diferentes cairiam exatamente uma em
- * cima da outra. O deslocamento é fixo por índice (nunca sorteado): o mapa é
- * sempre o mesmo mapa.
+ * Faixa por capítulo: todo mês do namoro é desenhado na MESMA curva do mundo
+ * (14 de altura: base 21, amplitude 7), então eles cairiam quase um dentro do
+ * outro — um empurrãozinho de 5 não separava nada. Aqui cada mês desce uma faixa
+ * e anda um pouco de lado. `BAND` é o botão: menor que a altura da curva (14) de
+ * propósito, pra as constelações ainda se cruzarem em vez de virarem pauta de
+ * caderno; com 10 elas separam completamente. Tudo fixo por índice, nunca
+ * sorteado: o mapa é sempre o mesmo mapa. O começo fica na faixa de cima (dy 0).
  */
-const nudge = (i: number) => ({ dx: ((i % 3) - 1) * 4.5, dy: (((i * 2) % 5) - 2) * 2.6 })
+const BAND = 4.5
+const SQUASH = 0.75
+const nudge = (i: number) => ({ dx: ((i % 3) - 1) * 6, dy: BAND * (i + 1) })
+
+/** distância mínima entre duas estrelas de céus diferentes */
+const GAP = 3.6
+
+/**
+ * Desencosta as estrelas que caíram uma em cima da outra. Afastar as camadas
+ * inteiras não resolve isso: o encontro é local (uma estrela de um mês que
+ * calha de bater numa de outro), e afastar tudo até o pior par se resolver
+ * deixa os céus longe demais, cada um na sua pauta. Então aqui as faixas ficam
+ * perto de propósito e só os pares que se tocam abrem caminho, empurrando um
+ * pra cima e o outro pra baixo, o de cima sendo sempre o do céu mais antigo.
+ * Roda uma vez, na montagem, e é determinístico: o mapa é sempre o mesmo mapa.
+ */
+function spread(ls: Layer[]) {
+  const all = ls.flatMap((l, li) =>
+    [...l.stars, ...(l.finale ? [l.finale] : [])].map((s) => ({ s, li })),
+  )
+  for (let pass = 0; pass < 24; pass++) {
+    let moved = false
+    for (let i = 0; i < all.length; i++) {
+      for (let j = i + 1; j < all.length; j++) {
+        if (all[i].li === all[j].li) continue
+        const a = all[i].s
+        const b = all[j].s
+        const d = Math.hypot(b.x - a.x, b.y - a.y)
+        if (d >= GAP) continue
+        const push = (GAP - d) / 2 + 0.02
+        const [up, down] = all[i].li < all[j].li ? [a, b] : [b, a]
+        up.y -= push
+        down.y += push
+        moved = true
+      }
+    }
+    if (!moved) break
+  }
+}
 
 /**
  * Todas as estrelas de todos os céus, sobrepostas num mapa só.
@@ -66,10 +108,9 @@ export function SkyMap({ onBack, poster = false }: { onBack?: () => void; poster
       out.push({
         key: 'comeco',
         label: 'como tudo começou',
-        stars: comeco.stars ?? [],
-        finale: comeco.finale,
-        dx: 0,
-        dy: 0,
+        // cópia: daqui pra frente as coordenadas são mexidas (ver `spread`)
+        stars: (comeco.stars ?? []).map((s) => ({ ...s })),
+        finale: comeco.finale && { ...comeco.finale },
         line: 0.32,
         color: SILVER,
       })
@@ -78,19 +119,33 @@ export function SkyMap({ onBack, poster = false }: { onBack?: () => void; poster
     const namoro = worlds.find((w) => w.id === 'namoro')
     if (namoro) {
       const chapters = buildChapters(namoro, NAMORO_DATE, new Date(), import.meta.env.DEV)
+      /**
+       * No mapa cada mês vira uma faixa mais fina: a curva do capítulo é
+       * achatada em volta da própria linha de base, senão três céus de 14 de
+       * altura não cabem um embaixo do outro sem estrela cair em cima de
+       * estrela. No céu do capítulo, sozinho na tela, ela continua inteira.
+       */
+      const base = namoro.arc.base
       chapters.forEach((c, i) => {
         if (c.stars.length === 0 && !c.finale) return
+        const { dx, dy } = nudge(i)
+        // a faixa do mês já entra resolvida: achatada, descida e deslocada
+        const put = <T extends PlacedStar>(s: T): T => ({
+          ...s,
+          x: s.x + dx,
+          y: (s.y - base) * SQUASH + base + dy,
+        })
         out.push({
           key: `namoro-${c.n}`,
           label: c.name,
-          stars: c.stars,
-          finale: c.finale,
-          ...nudge(i),
+          stars: c.stars.map(put),
+          finale: c.finale ? put(c.finale) : undefined,
           line: 0.6,
-          color: CHAPTER_COLORS[(c.n - 1) % CHAPTER_COLORS.length],
+          color: chapterColor(c.n),
         })
       })
     }
+    spread(out)
     return out
   }, [])
 
@@ -99,8 +154,6 @@ export function SkyMap({ onBack, poster = false }: { onBack?: () => void; poster
       layers.flatMap((l) => [
         ...l.stars.map((s) => ({
           ...s,
-          x: s.x + l.dx,
-          y: s.y + l.dy,
           layer: l.label,
           isFinale: false,
           color: l.color,
@@ -109,8 +162,6 @@ export function SkyMap({ onBack, poster = false }: { onBack?: () => void; poster
           ? [
               {
                 ...l.finale,
-                x: l.finale.x + l.dx,
-                y: l.finale.y + l.dy,
                 layer: l.label,
                 isFinale: true,
                 color: l.color,
@@ -177,10 +228,10 @@ export function SkyMap({ onBack, poster = false }: { onBack?: () => void; poster
             return (
               <line
                 key={`${l.key}-l${i}`}
-                x1={m.x + l.dx}
-                y1={m.y + l.dy}
-                x2={next.x + l.dx}
-                y2={next.y + l.dy}
+                x1={m.x}
+                y1={m.y}
+                x2={next.x}
+                y2={next.y}
                 stroke={l.color}
                 strokeWidth={0.22}
                 strokeLinecap="round"
@@ -227,9 +278,10 @@ export function SkyMap({ onBack, poster = false }: { onBack?: () => void; poster
       <div className="mt-4 flex min-h-[6.5rem] max-w-2xl flex-col items-center justify-start text-center">
         {sel ? (
           <>
-            <p className="label text-ember/90">
+            {/* a legenda veste a cor do mês da estrela, não o âmbar de sempre */}
+            <p className="label" style={{ color: sel.color }}>
               {sel.layer}
-              <span className="mx-2 text-mist">·</span>
+              <span className="mx-2 opacity-50">·</span>
               {fmtDate(sel.date)}
             </p>
             <h2 className="mt-2 font-display text-xl font-light italic text-star sm:text-2xl">

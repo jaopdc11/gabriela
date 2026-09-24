@@ -1,0 +1,12 @@
+Os cartazes dos filmes e séries da aba "nosso cinema".
+
+Uma imagem por título, com o nome do filme sem acento e com hífen no lugar do
+espaço:
+
+  interestelar.jpg
+  cidade-de-deus.jpg
+  the-last-of-us.jpg
+
+O site liga cada arquivo ao seu título sozinho (ver src/watchlist.ts). Formato:
+jpg, png ou webp — em pé, na proporção de cartaz (2:3), que é como a grade
+desenha.

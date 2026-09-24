@@ -3,7 +3,7 @@ import { DEFAULT_WORLD, NAMORO_DATE, monthTracks, worldById, type World } from '
 import { buildChapters, type Chapter } from './chapters'
 import { ChapterCard } from './components/ChapterCard'
 import { MonthLetter } from './components/Letter'
-import { SkyMap } from './components/SkyMap'
+import { SkyMap, chapterColor } from './components/SkyMap'
 import { Starfield } from './components/Starfield'
 import { CursorGlow } from './components/CursorGlow'
 import { Hero } from './components/Hero'
@@ -13,6 +13,9 @@ import { PhotoCarousel } from './components/PhotoCarousel'
 import { Epilogue, EpilogueNamoro } from './components/Epilogue'
 import { AmbientAudio } from './components/AmbientAudio'
 import { WorldSwitch } from './components/WorldSwitch'
+import { Aldebaran } from './components/Aldebaran'
+import { Cinema } from './components/Cinema'
+import { Everything } from './components/Everything'
 
 /** Mundo pedido na URL (?mundo=comeco), senão o padrão. */
 const worldFromUrl = (): World['id'] => {
@@ -44,13 +47,31 @@ const openingChapter = (chapters: Chapter[]) => {
 const mapFromUrl = () =>
   typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('mapa')
 
+/** A parede de cartazes mora em ?cinema=1. */
+const cinemaFromUrl = () =>
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('cinema')
+
+/** A história inteira em texto mora em ?tudo=1. */
+const everythingFromUrl = () =>
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('tudo')
+
 /** ?poster=1 deixa o mapa limpo (sem botões nem som), pra virar imagem. */
 const posterFromUrl = () =>
   typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('poster')
 
+/**
+ * O segredo mora em ?aldebaran=1: o olho do touro. Não tem link nenhum apontando
+ * pra cá em lugar nenhum do site — é de propósito, só existe se eu entregar.
+ */
+const secretFromUrl = () =>
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('aldebaran')
+
 export default function App() {
   const [showMap, setShowMap] = useState(mapFromUrl)
+  const [showCinema, setShowCinema] = useState(cinemaFromUrl)
+  const [showEverything, setShowEverything] = useState(everythingFromUrl)
   const poster = showMap && posterFromUrl()
+  const [secret, setSecret] = useState(secretFromUrl)
   const [worldId, setWorldId] = useState<World['id']>(worldFromUrl)
   const world = worldById(worldId)
 
@@ -99,35 +120,82 @@ export default function App() {
     url.searchParams.set('mundo', id)
     url.searchParams.delete('mes')
     url.searchParams.delete('mapa')
+    url.searchParams.delete('cinema')
+    url.searchParams.delete('tudo')
     url.hash = ''
     window.history.pushState({ mundo: id }, '', url)
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
     setShowMap(false)
+    setShowCinema(false)
+    setShowEverything(false)
     setWorldId(id)
     setChapterN(null)
   }, [])
 
-  /** entra e sai do mapa mantendo o resto da URL (link compartilhável). */
-  const toggleMap = useCallback((on: boolean) => {
+  /**
+   * Entra e sai das abas próprias (o mapa e o cinema) mantendo o resto da URL,
+   * pra continuar dando link. Só uma delas fica aberta por vez — abrir uma
+   * fecha a outra, senão o topo marcaria duas abas ao mesmo tempo.
+   */
+  const openTab = useCallback((tab: 'mapa' | 'cinema' | 'tudo' | null) => {
     const url = new URL(window.location.href)
-    if (on) url.searchParams.set('mapa', '1')
-    else url.searchParams.delete('mapa')
+    url.searchParams.delete('mapa')
+    url.searchParams.delete('cinema')
+    url.searchParams.delete('tudo')
+    if (tab) url.searchParams.set(tab, '1')
     url.hash = ''
-    window.history.pushState({ ...window.history.state, mapa: on }, '', url)
+    window.history.pushState({ ...window.history.state, aba: tab }, '', url)
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-    setShowMap(on)
+    setShowMap(tab === 'mapa')
+    setShowCinema(tab === 'cinema')
+    setShowEverything(tab === 'tudo')
+  }, [])
+
+  /** sai do segredo e volta pro site, sem deixar o ?aldebaran no endereço */
+  const closeSecret = useCallback(() => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('aldebaran')
+    url.hash = ''
+    window.history.pushState({ ...window.history.state, aldebaran: false }, '', url)
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+    setSecret(false)
   }, [])
 
   // voltar/avançar do navegador volta pro mundo, pro capítulo e pro mapa de antes
   useEffect(() => {
     const onPop = () => {
       setShowMap(mapFromUrl())
+      setShowCinema(cinemaFromUrl())
+      setShowEverything(everythingFromUrl())
       setWorldId(worldFromUrl())
       setChapterN(chapterFromUrl())
+      setSecret(secretFromUrl())
     }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
+
+  /**
+   * O segredo toma a tela inteira: sem o seletor de mundos em cima, pra ela não
+   * clicar fora sem querer e perder a página.
+   */
+  if (secret) {
+    return (
+      <div className="grain vignette relative">
+        <Starfield />
+        <CursorGlow />
+        <AmbientAudio tracks={monthTracks[1] ?? world.tracks} />
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-[80] bg-night-deep"
+          style={{ animation: 'fade-from-black 1.9s ease-out forwards' }}
+        />
+        <main className="relative z-10">
+          <Aldebaran onBack={closeSecret} />
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="grain vignette relative">
@@ -148,13 +216,25 @@ export default function App() {
       <WorldSwitch
         current={worldId}
         onChange={changeWorld}
-        onMap={() => toggleMap(true)}
+        onMap={() => openTab('mapa')}
         mapActive={showMap}
+        onCinema={() => openTab('cinema')}
+        cinemaActive={showCinema}
+        onEverything={() => openTab('tudo')}
+        everythingActive={showEverything}
       />
 
       {showMap ? (
         <main className="relative z-10">
           <SkyMap poster={poster} />
+        </main>
+      ) : showCinema ? (
+        <main className="relative z-10">
+          <Cinema onBack={() => openTab(null)} />
+        </main>
+      ) : showEverything ? (
+        <main className="relative z-10">
+          <Everything onBack={() => openTab(null)} />
         </main>
       ) : (
       /* a key remonta tudo na troca: as animações de entrada rodam de novo */
@@ -179,6 +259,7 @@ export default function App() {
               )}
               <NightJourney
                 stars={chapter.stars}
+                color={chapterColor(chapter.n)}
                 finale={chapter.finale}
                 seed={chapter.seed}
                 label={`${chapter.name}, nas estrelas`}

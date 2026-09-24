@@ -31,8 +31,6 @@ export function PrologueNamoro() {
         as brigas que a gente atravessar, as manhãs. eu vou acendendo, e tu vem ver nossa constelação se formar.
       </Line>
 
-      <Beat big>é pra durar, e eu tô só começando.</Beat>
-
       <Reveal>
         <a
           href="#ceu"

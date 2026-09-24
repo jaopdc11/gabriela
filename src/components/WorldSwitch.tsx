@@ -11,13 +11,25 @@ export function WorldSwitch({
   onChange,
   onMap,
   mapActive = false,
+  onCinema,
+  cinemaActive = false,
+  onEverything,
+  everythingActive = false,
 }: {
   current: World['id']
   onChange: (id: World['id']) => void
   /** abre a aba do nosso céu: todas as estrelas dos dois mundos num mapa só */
   onMap?: () => void
   mapActive?: boolean
+  /** abre o nosso cinema: os filmes e séries que a gente vê junto */
+  onCinema?: () => void
+  cinemaActive?: boolean
+  /** abre o tudo: a história inteira em texto, numa rolagem só */
+  onEverything?: () => void
+  everythingActive?: boolean
 }) {
+  /** nenhuma aba de mundo fica marcada quando o topo está numa aba própria */
+  const aside = mapActive || cinemaActive || everythingActive
   const [shown, setShown] = useState(true)
 
   useEffect(() => {
@@ -47,14 +59,15 @@ export function WorldSwitch({
         shown ? 'translate-y-0 opacity-100' : '-translate-y-6 opacity-0'
       }`}
     >
-      <div className="flex items-center gap-1 rounded-full border border-white/10 bg-night-deep/70 p-1 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.9)] backdrop-blur-md">
+      {/* com quatro abas o trilho estoura no celular: rola de lado em vez de quebrar */}
+      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/10 bg-night-deep/70 p-1 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.9)] backdrop-blur-md">
         {worlds.map((w) => (
           <button
             key={w.id}
             onClick={() => onChange(w.id)}
-            aria-current={!mapActive && w.id === current ? 'page' : undefined}
-            className={`label rounded-full px-3.5 py-1.5 transition-colors ${
-              !mapActive && w.id === current
+            aria-current={!aside && w.id === current ? 'page' : undefined}
+            className={`label shrink-0 rounded-full px-3 py-1.5 transition-colors sm:px-3.5 ${
+              !aside && w.id === current
                 ? 'bg-ember/15 text-ember ring-1 ring-ember/40'
                 : 'text-mist hover:text-star'
             }`}
@@ -66,13 +79,39 @@ export function WorldSwitch({
           <button
             onClick={onMap}
             aria-current={mapActive ? 'page' : undefined}
-            className={`label rounded-full px-3.5 py-1.5 transition-colors ${
+            className={`label shrink-0 rounded-full px-3 py-1.5 transition-colors sm:px-3.5 ${
               mapActive
                 ? 'bg-ember/15 text-ember ring-1 ring-ember/40'
                 : 'text-mist hover:text-star'
             }`}
           >
             nosso céu
+          </button>
+        )}
+        {onCinema && (
+          <button
+            onClick={onCinema}
+            aria-current={cinemaActive ? 'page' : undefined}
+            className={`label shrink-0 rounded-full px-3 py-1.5 transition-colors sm:px-3.5 ${
+              cinemaActive
+                ? 'bg-ember/15 text-ember ring-1 ring-ember/40'
+                : 'text-mist hover:text-star'
+            }`}
+          >
+            nosso cinema
+          </button>
+        )}
+        {onEverything && (
+          <button
+            onClick={onEverything}
+            aria-current={everythingActive ? 'page' : undefined}
+            className={`label shrink-0 rounded-full px-3 py-1.5 transition-colors sm:px-3.5 ${
+              everythingActive
+                ? 'bg-ember/15 text-ember ring-1 ring-ember/40'
+                : 'text-mist hover:text-star'
+            }`}
+          >
+            tudo
           </button>
         )}
       </div>

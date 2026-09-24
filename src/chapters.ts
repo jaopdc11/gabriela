@@ -2,8 +2,10 @@ import {
   monthDedications,
   monthMarks,
   place,
+  type Arc,
   type Dedication,
   type Finale,
+  type Milestone,
   type PlacedStar,
   type World,
 } from './data'
@@ -98,6 +100,26 @@ const COUNT = [
 const markLabel = (n: number) =>
   `${COUNT[n - 1] ?? n} ${n === 1 ? 'mês' : 'meses'} de nós`
 
+/**
+ * A curva daquele mês. Todo capítulo nasce da mesma curva do mundo, e se ela
+ * for usada crua todos os meses saem com o MESMO desenho — no mapa, onde eles
+ * aparecem juntos, isso vira pauta de caderno por mais que a gente afaste um do
+ * outro. Então cada mês torce a curva do seu jeito: outra fase, outra altura de
+ * onda, outro tanto de ondulação. É fixo por número do mês (nunca sorteado), e
+ * o mês 1 fica idêntico ao que já foi publicado.
+ */
+const AMP = [1, 0.82, 1.15, 0.92]
+const FREQ = [1, 1.4, 0.85, 1.2]
+const chapterArc = (a: Arc, n: number): Arc => {
+  const i = (n - 1) % 4
+  return {
+    ...a,
+    amp: a.amp * AMP[i],
+    freq: a.freq * FREQ[i],
+    phase: a.phase + (n - 1) * 2.1,
+  }
+}
+
 /** `d` mais `n` meses, sem estourar pra o mês seguinte em mês curto. */
 export function addMonths(d: Date, n: number): Date {
   const target = new Date(d.getFullYear(), d.getMonth() + n, 1)
@@ -112,11 +134,19 @@ export function addMonths(d: Date, n: number): Date {
   )
 }
 
+/**
+ * Meia-noite do dia de `d`. O mês vira no DIA do aniversário de mês, não na
+ * hora: o sim foi 23/07 às 21:30, mas o dia 23 inteiro já é aniversário. Sem
+ * isso, no dia 23 de manhã o site ainda abriria no mês anterior — e é de manhã,
+ * no dia, que eu mostro pra ela.
+ */
+const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+
 /** Meses de namoro já completos em `at` (0 = ainda dentro do primeiro mês). */
 export function monthsCompleted(start: Date, at: Date): number {
   let m = (at.getFullYear() - start.getFullYear()) * 12 + (at.getMonth() - start.getMonth())
-  // o mês só fecha quando chega o dia (e a hora) do aniversário de mês
-  if (m > 0 && at.getTime() < addMonths(start, m).getTime()) m--
+  // o mês fecha quando chega o dia do aniversário de mês, na virada dele
+  if (m > 0 && dayStart(at) < dayStart(addMonths(start, m))) m--
   return Math.max(0, m)
 }
 
@@ -128,7 +158,7 @@ export const chapterNav = (n: number) => `mês ${n}`
 
 /**
  * Monta os capítulos do mundo: um por mês vivido, do sim até hoje. O mês
- * corrente entra mesmo vazio — ele é o que está acontecendo agora.
+ * corrente só entra quando já tem estrela.
  *
  * `dev` (o `import.meta.env.DEV` do Vite) libera o que está marcado como
  * rascunho — a carta e o fecho do mês: aparecem rodando local, e ficam fora do
@@ -136,15 +166,22 @@ export const chapterNav = (n: number) => `mês ${n}`
  */
 export function buildChapters(world: World, start: Date, now: Date, dev: boolean): Chapter[] {
   const source = world.milestones ?? world.stars ?? []
-  const lastStar = source.reduce((max, s) => Math.max(max, chapterOf(start, s.date)), 0)
-  const total = Math.max(chapterOf(start, now), lastStar, 1)
+  // a data manda, a não ser que a estrela diga em que mês ela quer entrar
+  const chapterOfStar = (s: Milestone) => s.chapter ?? chapterOf(start, s.date)
+  const lastStar = source.reduce((max, s) => Math.max(max, chapterOfStar(s)), 0)
+  /**
+   * O mês corrente só entra quando já tem estrela nele. Vazio, ele é só uma
+   * cartela do mês que vem roubando a festa do que fechou — e como o site é
+   * entregue no aniversário de mês, na prática ela vê cada mês novo já pronto.
+   */
+  const total = Math.max(chapterOf(start, now) - 1, lastStar, 1)
 
   return Array.from({ length: total }, (_, i) => {
     const n = i + 1
     const chapterStart = addMonths(start, i)
     const chapterEnd = addMonths(start, n)
-    const stars = source.filter((s) => chapterOf(start, s.date) === n)
-    const closed = now.getTime() >= chapterEnd.getTime()
+    const stars = source.filter((s) => chapterOfStar(s) === n)
+    const closed = dayStart(now) >= dayStart(chapterEnd)
     /**
      * No site publicado, a carta e o fecho do mês só entram quando o mês fechou
      * de verdade, e nunca se forem rascunho. Rodando local aparece tudo, pra dar
@@ -153,19 +190,27 @@ export function buildChapters(world: World, start: Date, now: Date, dev: boolean
     const ready = (piece?: { draft?: boolean }) => !!piece && (dev || (closed && !piece.draft))
 
     const mark = monthMarks[n]
-    const finale: Finale | undefined =
-      ready(mark)
-        ? {
-            ...mark,
-            date: chapterEnd,
-            label: markLabel(n),
-            x: 93,
-            y: 12,
-          }
+    /**
+     * Sem estrela de aniversário de mês escrita, quem fecha o capítulo é a
+     * ÚLTIMA ESTRELA DO ARRAY do mês (a ordem do array manda, não a data) — o
+     * mês acaba no último momento que aconteceu, sem precisar de uma estrela
+     * escrita só pra fechar. Precisa sobrar pelo menos uma estrela comum.
+     */
+    const promoted =
+      !ready(mark) && (dev || closed) && stars.length > 1 ? stars[stars.length - 1] : undefined
+
+    const finale: Finale | undefined = ready(mark)
+      ? { ...mark, date: chapterEnd, label: markLabel(n), x: 97, y: 12 }
+      : promoted
+        ? { ...promoted, label: markLabel(n), x: 97, y: 12 }
         : undefined
 
-    // com fecho de mês, a curva encolhe um pouco pra abrir espaço pra ele no fim
-    const arc = finale ? { ...world.arc, x1: Math.min(world.arc.x1, 84) } : world.arc
+    // a estrela promovida sai da constelação: ela agora é o fecho
+    const rest = promoted ? stars.slice(0, -1) : stars
+
+    // a curva desse mês, e com fecho ela encolhe um pouco pra abrir espaço no fim
+    const mine = chapterArc(world.arc, n)
+    const arc = finale ? { ...mine, x1: Math.min(mine.x1, 90) } : mine
 
     const letter = monthDedications[n]
     const dedication = ready(letter) ? letter : undefined
@@ -182,7 +227,7 @@ export function buildChapters(world: World, start: Date, now: Date, dev: boolean
       end: chapterEnd,
       seed: world.seed + n * 977,
       // o céu de cada mês é montado sozinho pela curva do mundo
-      stars: place(stars, arc),
+      stars: place(rest, arc),
       finale,
       dedication,
       current: n === chapterOf(start, now),
